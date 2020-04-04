@@ -1,0 +1,43 @@
+<project
+    name = "cucumber-c" 
+    description = "Cucumber implementation for C"
+    prefix = "cucumber"
+    script = "zproject.gsl"
+    email = "mail@kevinsapper.de"
+    repository = "https://github.com/sappo/cucumber-c"
+    url = "https://github.com/sappo/cucumber-c"
+    license = "MPL-2.0" >
+
+    <include filename = "license.xml" />
+    <version major = "0" minor = "1" />
+    <abi current = "0" revision = "1" age = "0" />
+
+    <use project = "czmq" />
+
+    <use project = "gherkin" 
+        header = "compiler.h"
+        repository = "https://github.com/cucumber/gherkin-c"
+        test = "Compiler_new" />
+
+    <!-- Needs to be part of gherkin-c -->
+    <use project = "math" prefix = "m"
+        header = "math.h"
+        repository = ""
+        test = "sqrt" />
+
+    <use project = "cJson"
+         header = "cjson/cJSON.h"
+         repository = "https://github.com/DaveGamble/cJSON"
+         test = "cJSON_Parse" />
+
+    <main name = "cucumber_runner" />
+    <main name = "step_defs" />
+
+    <class name = "cuc_gherkin_doc" />
+    <class name = "cuc_pickle" />
+    <class name = "cucumber" />
+    <class name = "cucumber_step_def" />
+
+    <target name ="travis" />
+
+</project>
