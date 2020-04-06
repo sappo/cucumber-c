@@ -9,23 +9,27 @@
     file, You can obtain one at http://mozilla.org/MPL/2.0/.
     =========================================================================
 */
-#include "cuc_classes.h"
+#include "cucumber_classes.h"
+
+typedef struct _my_state_t {
+    int filler;
+} my_state_t;
 
 void
-given_a_topic (zrex_t *rex) {
+given_a_topic (zrex_t *rex, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
-    //printf ("OUTPUT: Creating topic %s for %s\n", topic, text);
+    my_state_t *state = (my_state_t *) state_p;
 }
 
 void
-when_message_is_sent (zrex_t *rex) {
+when_message_is_sent (zrex_t *rex, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
-    //printf ("OUTPUT: Sending %s on topic %s\n", text, topic);
+    my_state_t *state = (my_state_t *) state_p;
 }
 
-STEP_DEFS(protocol) {
+STEP_DEFS(protocol, my_state_t) {
     GIVEN("a dafka (\\w+) subscribed to topic '(\\w+)'",
           given_a_topic)
 

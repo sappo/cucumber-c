@@ -19,7 +19,7 @@ extern "C" {
 
 //  @interface
 
-typedef void (cucumber_step) (zrex_t *);
+typedef void (cucumber_step) (zrex_t *, void *);
 
 //  Create a new cucumber_step_def
 CUCUMBER_EXPORT cucumber_step_def_t *
@@ -36,6 +36,7 @@ CUCUMBER_EXPORT bool
 
 //  Runs this step definition
 CUCUMBER_EXPORT void
+    cucumber_step_def_run (cucumber_step_def_t *self, void *opts);
 
 //  Self test of this class
 CUCUMBER_EXPORT void

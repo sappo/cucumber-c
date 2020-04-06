@@ -17,9 +17,9 @@
 #include "cucumber_library.h"
 
 //  Add your own public definitions here, if you need them
-#define STEP_DEFS(name)\
+#define STEP_DEFS(name, state_t)\
     void register_##name##_step_defs (cucumber_t *cucumber);\
-    \
+    static state_t state;\
     int main() {\
         zsock_t *server = zsock_new_pull ("@tcp://127.0.0.1:8888");\
         assert (server);\
@@ -38,7 +38,7 @@
                 cucumber_step_def_t *step_def = cucumber_find_step_def (cucumber, pickle_step);\
                 printf ("  Step: %s ", pickle_step);\
                 if (step_def) {\
-                    cucumber_step_def_run (step_def);\
+                    cucumber_step_def_run (step_def, (void *) &state);\
                     printf ("(OK)\n");\
                 }\
                 else {\
