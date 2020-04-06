@@ -26,7 +26,44 @@ To report an issue, use the [Cucumber-C issue tracker](https://github.com/sappo/
 
 ## Getting started
 
-TBD...
+You can define your step definitions as follows:
+
+```C
+typedef struct _my_state_t {
+    int filler;
+} my_state_t;
+
+void
+given_a_topic (zrex_t *rex, void *state_p) {
+    const char *text, *topic;
+    FETCH_PARAMS(&text, &topic)
+    my_state_t *state = (my_state_t *) state_p;
+}
+
+void
+when_message_is_sent (zrex_t *rex, void *state_p) {
+    const char *text, *topic;
+    FETCH_PARAMS(&text, &topic)
+    my_state_t *state = (my_state_t *) state_p;
+}
+
+STEP_DEFS(protocol, my_state_t) {
+    GIVEN("a dafka (\\w+) subscribed to topic '(\\w+)'",
+          given_a_topic)
+
+    WHEN("a (\\w+) message with sequence larger 0 is sent on topic '(\\w+)'",
+         when_message_is_sent)
+}
+```
+
+Now compile and run your step definitions
+
+    gcc my_step_defs.c -o my_step_defs -l cucumber-c 
+    ./my_step_defs
+
+To run your feature file use the cucumber_runner:
+
+    cucumber_runner my_usecase.feature
 
 ## Under the Hood
 
