@@ -23,7 +23,8 @@ save.xml
 # Executables
 src/cucumber-c_selftest
 src/cucumber_runner
-src/cuc_selftest
+src/step_defs
+src/cucumber_selftest
 *.exe
 *.out
 *.app
