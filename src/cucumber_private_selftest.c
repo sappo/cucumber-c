@@ -1,5 +1,5 @@
 /*  =========================================================================
-    cuc_private_selftest.c - run private classes selftests
+    cucumber_private_selftest.c - run private classes selftests
 
     Runs all private classes selftests.
 
@@ -18,7 +18,7 @@
     =========================================================================
 */
 
-#include "cuc_classes.h"
+#include "cucumber_classes.h"
 
 
 //  -------------------------------------------------------------------------
@@ -26,7 +26,7 @@
 //
 
 void
-cuc_private_selftest (bool verbose, const char *subtest)
+cucumber_private_selftest (bool verbose, const char *subtest)
 {
 }
 /*

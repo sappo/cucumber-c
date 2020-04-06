@@ -26,11 +26,11 @@ PV_MAJOR=`echo $PACKAGE_VERSION | cut -d . -f 1`
 PV_MINOR=`echo $PACKAGE_VERSION | cut -d . -f 2`
 PV_PATCH=`echo $PACKAGE_VERSION | cut -d . -f 3`
 AC_DEFINE_UNQUOTED([PACKAGE_VERSION_MAJOR],[$PV_MAJOR],
-    [CUC major version])
+    [CUCUMBER major version])
 AC_DEFINE_UNQUOTED([PACKAGE_VERSION_MINOR],[$PV_MINOR],
-    [CUC minor version])
+    [CUCUMBER minor version])
 AC_DEFINE_UNQUOTED([PACKAGE_VERSION_PATCH],[$PV_PATCH],
-    [CUC patchlevel])
+    [CUCUMBER patchlevel])
 # This lets us use PACKAGE_VERSION in Makefiles
 AC_SUBST(PACKAGE_VERSION)
 
@@ -41,7 +41,7 @@ AC_SUBST(PACKAGE_VERSION)
 # know exactly what you're doing and have read and understand
 # http://www.gnu.org/software/libtool/manual/html_node/Updating-version-info.html
 #
-# libcuc -version-info
+# libcucumber -version-info
 LTVER="0:1:0"
 AC_SUBST(LTVER)
 
@@ -49,7 +49,7 @@ AC_SUBST(LTVER)
 AM_CONDITIONAL([USING_VPATH], [test "x${srcdir}" != "x."])
 
 # Capture c flags
-CUC_ORIG_CFLAGS="${CFLAGS:-none}"
+CUCUMBER_ORIG_CFLAGS="${CFLAGS:-none}"
 
 # Checks for programs
 AC_PROG_CC
@@ -73,13 +73,13 @@ AM_CONDITIONAL(WITH_CPPCHECK, $WITH_CPPCHECK)
 AC_MSG_CHECKING([whether to enable GCov])
 AC_ARG_WITH(gcov, [AS_HELP_STRING([--with-gcov=yes/no],
                   [With GCC Code Coverage reporting])],
-                  [CUC_GCOV="$withval"])
+                  [CUCUMBER_GCOV="$withval"])
 
-if test "x${CUC_GCOV}" == "xyes"; then
+if test "x${CUCUMBER_GCOV}" == "xyes"; then
     CFLAGS="-O0 -g -fprofile-arcs -ftest-coverage"
 
-    if test "x${CUC_ORIG_CFLAGS}" != "xnone"; then
-        CFLAGS="${CFLAGS} ${CUC_ORIG_CFLAGS}"
+    if test "x${CUCUMBER_ORIG_CFLAGS}" != "xnone"; then
+        CFLAGS="${CFLAGS} ${CUCUMBER_ORIG_CFLAGS}"
     fi
     AM_CONDITIONAL(WITH_GCOV, true)
     AC_MSG_RESULT([yes])
@@ -92,9 +92,9 @@ fi
 AC_MSG_CHECKING([whether to enable ASan])
 AC_ARG_ENABLE(address-sanitizer, [AS_HELP_STRING([--enable-address-sanitizer=yes/no],
                   [Build with GCC Address Sanitizer instrumentation])],
-                  [CUC_ASAN="$enableval"])
+                  [CUCUMBER_ASAN="$enableval"])
 
-if test "x${CUC_ASAN}" == "xyes"; then
+if test "x${CUCUMBER_ASAN}" == "xyes"; then
     CFLAGS="${CFLAGS} -fsanitize=address"
     CXXFLAGS="${CXXFLAGS} -fsanitize=address"
 
@@ -329,7 +329,7 @@ dnl END of enabled attempts to search for libczmq
 
 was_gherkin_check_lib_detected=no
 
-search_gherkin="no"
+search_gherkin="yes"
 
 AC_ARG_WITH([gherkin],
     [
@@ -346,6 +346,10 @@ AS_CASE([x"${with_gherkin}"],
     [xyes], [search_gherkin="yes"],
     [xno],  [search_gherkin="no"])
 
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_gherkin}" = xno],
+    [AC_MSG_WARN([Required dependency on gherkin was explicitly disabled during configuration by '--with-gherkin=no'; subsequent full build of cucumber-c may fail])])
 
 AS_IF([test x"${search_gherkin}" = xyes], [
     # Archive previously detected and supplied flags
@@ -355,7 +359,6 @@ AS_IF([test x"${search_gherkin}" = xyes], [
     found_pkgconfig=""
     PKG_CHECK_MODULES([gherkin], [gherkin >= 0.0.0],
     [
-        AC_DEFINE(HAVE_GHERKIN, 1, [The optional gherkin library is to be used])
         was_gherkin_check_lib_detected=pkgcfg
         found_pkgconfig="gherkin"
     ],
@@ -370,11 +373,11 @@ AS_IF([test x"${search_gherkin}" = xyes], [
                 gherkin_synthetic_cflags="-I${with_gherkin}/include"
                 gherkin_synthetic_libs="-L${with_gherkin}/lib -lgherkin"
             else
-            AC_MSG_WARN([Header file ${with_gherkin}/include/compiler.h was not found. Please check gherkin prefix])
+            AC_MSG_ERROR([Header file ${with_gherkin}/include/compiler.h was not found. Please check gherkin prefix])
             fi
         else
             AC_CHECK_HEADER([compiler.h], [],
-            AC_MSG_WARN([Header file compiler.h was not found in default search paths])
+            AC_MSG_ERROR([Header file compiler.h was not found in default search paths])
                 )
         fi
 
@@ -382,9 +385,8 @@ AS_IF([test x"${search_gherkin}" = xyes], [
             [
                 was_gherkin_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lgherkin"
-                AC_DEFINE(HAVE_GHERKIN, 1, [The optional gherkin library is to be used (as -lgherkin)])
             ],
-            [])
+            [AC_MSG_ERROR([cannot link with -lgherkin, install gherkin])])
     ])
 
 dnl END of PKG_CHECK_MODULES and/or direct tests for gherkin
@@ -403,7 +405,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for gherkin
                 AC_SUBST([gherkin_LIBS],[${gherkin_synthetic_libs}])
             ],
         [xno], [
-            AC_MSG_WARN([Cannot find pkg-config metadata for gherkin 0.0.0 or higher])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for gherkin 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for gherkin
@@ -411,7 +413,7 @@ dnl END of enabled attempts to search for gherkin
 
 was_math_check_lib_detected=no
 
-search_math="no"
+search_math="yes"
 
 AC_ARG_WITH([math],
     [
@@ -428,6 +430,10 @@ AS_CASE([x"${with_math}"],
     [xyes], [search_math="yes"],
     [xno],  [search_math="no"])
 
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_math}" = xno],
+    [AC_MSG_WARN([Required dependency on math was explicitly disabled during configuration by '--with-math=no'; subsequent full build of cucumber-c may fail])])
 
 AS_IF([test x"${search_math}" = xyes], [
     # Archive previously detected and supplied flags
@@ -437,7 +443,6 @@ AS_IF([test x"${search_math}" = xyes], [
     found_pkgconfig=""
     PKG_CHECK_MODULES([math], [math >= 0.0.0],
     [
-        AC_DEFINE(HAVE_MATH, 1, [The optional math library is to be used])
         was_math_check_lib_detected=pkgcfg
         found_pkgconfig="math"
     ],
@@ -452,11 +457,11 @@ AS_IF([test x"${search_math}" = xyes], [
                 math_synthetic_cflags="-I${with_math}/include"
                 math_synthetic_libs="-L${with_math}/lib -lm"
             else
-            AC_MSG_WARN([Header file ${with_math}/include/math.h was not found. Please check math prefix])
+            AC_MSG_ERROR([Header file ${with_math}/include/math.h was not found. Please check math prefix])
             fi
         else
             AC_CHECK_HEADER([math.h], [],
-            AC_MSG_WARN([Header file math.h was not found in default search paths])
+            AC_MSG_ERROR([Header file math.h was not found in default search paths])
                 )
         fi
 
@@ -464,9 +469,8 @@ AS_IF([test x"${search_math}" = xyes], [
             [
                 was_math_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lm"
-                AC_DEFINE(HAVE_MATH, 1, [The optional math library is to be used (as -lm)])
             ],
-            [])
+            [AC_MSG_ERROR([cannot link with -lm, install math])])
     ])
 
 dnl END of PKG_CHECK_MODULES and/or direct tests for math
@@ -485,7 +489,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for math
                 AC_SUBST([math_LIBS],[${math_synthetic_libs}])
             ],
         [xno], [
-            AC_MSG_WARN([Cannot find pkg-config metadata for math 0.0.0 or higher])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for math 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for math
@@ -493,7 +497,7 @@ dnl END of enabled attempts to search for math
 
 was_cjson_check_lib_detected=no
 
-search_cjson="no"
+search_cjson="yes"
 
 AC_ARG_WITH([cjson],
     [
@@ -510,6 +514,10 @@ AS_CASE([x"${with_cjson}"],
     [xyes], [search_cjson="yes"],
     [xno],  [search_cjson="no"])
 
+dnl We do not abort right now, because the maintainer/developer may have
+dnl something particular in mind, e.g. to build just parts of a project.
+AS_IF([test x"${search_cjson}" = xno],
+    [AC_MSG_WARN([Required dependency on cjson was explicitly disabled during configuration by '--with-cjson=no'; subsequent full build of cucumber-c may fail])])
 
 AS_IF([test x"${search_cjson}" = xyes], [
     # Archive previously detected and supplied flags
@@ -519,7 +527,6 @@ AS_IF([test x"${search_cjson}" = xyes], [
     found_pkgconfig=""
     PKG_CHECK_MODULES([cjson], [cjson >= 0.0.0],
     [
-        AC_DEFINE(HAVE_CJSON, 1, [The optional cjson library is to be used])
         was_cjson_check_lib_detected=pkgcfg
         found_pkgconfig="cjson"
     ],
@@ -530,15 +537,15 @@ AS_IF([test x"${search_cjson}" = xyes], [
         cjson_synthetic_libs="-lcjson"
 
         if test -n "${with_cjson}" && test x"${with_cjson}" != xyes && test x"${with_cjson}" != xno; then
-            if test -r "${with_cjson}/include/cjson/cjson.h"; then
+            if test -r "${with_cjson}/include/cjson/cJSON.h"; then
                 cjson_synthetic_cflags="-I${with_cjson}/include"
                 cjson_synthetic_libs="-L${with_cjson}/lib -lcjson"
             else
-            AC_MSG_WARN([Header file ${with_cjson}/include/cjson/cjson.h was not found. Please check cjson prefix])
+            AC_MSG_ERROR([Header file ${with_cjson}/include/cjson/cJSON.h was not found. Please check cjson prefix])
             fi
         else
-            AC_CHECK_HEADER([cjson/cjson.h], [],
-            AC_MSG_WARN([Header file cjson/cjson.h was not found in default search paths])
+            AC_CHECK_HEADER([cjson/cJSON.h], [],
+            AC_MSG_ERROR([Header file cjson/cJSON.h was not found in default search paths])
                 )
         fi
 
@@ -546,9 +553,8 @@ AS_IF([test x"${search_cjson}" = xyes], [
             [
                 was_cjson_check_lib_detected=yes
                 PKGCFG_LIBS_PRIVATE="$PKGCFG_LIBS_PRIVATE -lcjson"
-                AC_DEFINE(HAVE_CJSON, 1, [The optional cjson library is to be used (as -lcjson)])
             ],
-            [])
+            [AC_MSG_ERROR([cannot link with -lcjson, install cjson])])
     ])
 
 dnl END of PKG_CHECK_MODULES and/or direct tests for cjson
@@ -567,7 +573,7 @@ dnl END of PKG_CHECK_MODULES and/or direct tests for cjson
                 AC_SUBST([cjson_LIBS],[${cjson_synthetic_libs}])
             ],
         [xno], [
-            AC_MSG_WARN([Cannot find pkg-config metadata for cjson 0.0.0 or higher])
+            AC_MSG_ERROR([Cannot find pkg-config metadata for cjson 0.0.0 or higher])
     ])
 ])
 dnl END of enabled attempts to search for cjson
@@ -625,20 +631,20 @@ AC_MSG_RESULT([$cucumber_c_build_doc])
 AC_MSG_CHECKING([whether to install manpages])
 AC_MSG_RESULT([$cucumber_c_install_man])
 
-# Set some default features required by libcuc code.
-CPPFLAGS="-DCUC_INTERNAL_BUILD -D_REENTRANT -D_THREAD_SAFE $CPPFLAGS"
+# Set some default features required by libcucumber code.
+CPPFLAGS="-DCUCUMBER_INTERNAL_BUILD -D_REENTRANT -D_THREAD_SAFE $CPPFLAGS"
 
 # OS-specific tests
 case "${host_os}" in
     *linux*)
         # Define on Linux to enable all library features
         CPPFLAGS="-D_GNU_SOURCE -DLINUX $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_LINUX, 1, [Have Linux OS])
+        AC_DEFINE(CUCUMBER_HAVE_LINUX, 1, [Have Linux OS])
         cucumber_c_on_linux="yes"
 
         case "${host_os}" in
             *android*)
-                AC_DEFINE(CUC_HAVE_ANDROID, 1, [Have Android OS])
+                AC_DEFINE(CUCUMBER_HAVE_ANDROID, 1, [Have Android OS])
                 cucumber_c_on_android="yes"
             ;;
         esac
@@ -648,46 +654,46 @@ case "${host_os}" in
         CPPFLAGS="-D_PTHREADS $CPPFLAGS"
         # Allow definitions of common OS-provided functions that are not in old standards
         CPPFLAGS="-D__EXTENSIONS__ $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_SOLARIS, 1, [Have Solaris OS])
+        AC_DEFINE(CUCUMBER_HAVE_SOLARIS, 1, [Have Solaris OS])
         CFLAGS="${CFLAGS} -lsocket -lssp"
         ;;
     *freebsd*)
         # Define on FreeBSD to enable all library features
         CPPFLAGS="-D__BSD_VISIBLE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_FREEBSD, 1, [Have FreeBSD OS])
+        AC_DEFINE(CUCUMBER_HAVE_FREEBSD, 1, [Have FreeBSD OS])
         ;;
     *darwin*)
         # Define on Darwin to enable all library features
         CPPFLAGS="-D_DARWIN_C_SOURCE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_OSX, 1, [Have DarwinOSX OS])
+        AC_DEFINE(CUCUMBER_HAVE_OSX, 1, [Have DarwinOSX OS])
         ;;
     *netbsd*)
         # Define on NetBSD to enable all library features
         CPPFLAGS="-D_NETBSD_SOURCE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_NETBSD, 1, [Have NetBSD OS])
+        AC_DEFINE(CUCUMBER_HAVE_NETBSD, 1, [Have NetBSD OS])
         ;;
     *openbsd*)
         # Define on OpenBSD to enable all library features
         CPPFLAGS="-D_BSD_SOURCE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_OPENBSD, 1, [Have OpenBSD OS])
+        AC_DEFINE(CUCUMBER_HAVE_OPENBSD, 1, [Have OpenBSD OS])
         ;;
     *nto-qnx*)
-        AC_DEFINE(CUC_HAVE_QNXNTO, 1, [Have QNX Neutrino OS])
+        AC_DEFINE(CUCUMBER_HAVE_QNXNTO, 1, [Have QNX Neutrino OS])
         ;;
     *aix*)
-        AC_DEFINE(CUC_HAVE_AIX, 1, [Have AIX OS])
+        AC_DEFINE(CUCUMBER_HAVE_AIX, 1, [Have AIX OS])
         ;;
     *hpux*)
         # Define on HP-UX to enable all library features
         CPPFLAGS="-D_POSIX_C_SOURCE=200112L"
-        AC_DEFINE(CUC_HAVE_HPUX, 1, [Have HPUX OS])
+        AC_DEFINE(CUCUMBER_HAVE_HPUX, 1, [Have HPUX OS])
         ;;
     *mingw32*)
         # Disable format error due to incomplete ANSI C
         CFLAGS="-Wno-error=format -Wno-unused-function -Wno-unused-variable -D_XOPEN_SOURCE $CFLAGS"
         CPPFLAGS="-Wno-error=format -Wno-unused-function -Wno-unused-variable -D_XOPEN_SOURCE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_WINDOWS, 1, [Have Windows OS])
-        AC_DEFINE(CUC_HAVE_MINGW32, 1, [Have MinGW32])
+        AC_DEFINE(CUCUMBER_HAVE_WINDOWS, 1, [Have Windows OS])
+        AC_DEFINE(CUCUMBER_HAVE_MINGW32, 1, [Have MinGW32])
         AC_CHECK_HEADERS(windows.h)
         cucumber_c_on_mingw32="yes"
         cucumber_c_install_man="no"
@@ -697,8 +703,8 @@ case "${host_os}" in
         # Disable format error due to incomplete ANSI C
         CFLAGS="-Wno-error=format -Wno-unused-function -Wno-unused-variable -D_XOPEN_SOURCE $CFLAGS"
         CPPFLAGS="-Wno-error=format -Wno-unused-function -Wno-unused-variable -D_XOPEN_SOURCE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_WINDOWS, 1, [Have Windows OS])
-        AC_DEFINE(CUC_HAVE_MINGW32, 1, [Have MinGW32])
+        AC_DEFINE(CUCUMBER_HAVE_WINDOWS, 1, [Have Windows OS])
+        AC_DEFINE(CUCUMBER_HAVE_MINGW32, 1, [Have MinGW32])
         AC_CHECK_HEADERS(windows.h)
         cucumber_c_on_mingw32="yes"
         cucumber_c_install_man="no"
@@ -706,7 +712,7 @@ case "${host_os}" in
     *cygwin*)
         # Define on Cygwin to enable all library features
         CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
-        AC_DEFINE(CUC_HAVE_CYGWIN, 1, [Have Cygwin])
+        AC_DEFINE(CUCUMBER_HAVE_CYGWIN, 1, [Have Cygwin])
         cucumber_c_on_cygwin="yes"
         ;;
     gnu*)
@@ -714,7 +720,7 @@ case "${host_os}" in
         if test "x$GXX" = "xyes"; then
             CPPFLAGS="-D_GNU_SOURCE $CPPFLAGS"
         fi
-        AC_DEFINE(CUC_HAVE_GNU, 1, [Have GNU/Hurd OS])
+        AC_DEFINE(CUCUMBER_HAVE_GNU, 1, [Have GNU/Hurd OS])
         cucumber_c_on_gnu="yes"
         ;;
     *)
@@ -788,15 +794,15 @@ AC_ARG_ENABLE([step_defs],
 AM_CONDITIONAL([ENABLE_STEP_DEFS], [test x$enable_step_defs != xno])
 AM_COND_IF([ENABLE_STEP_DEFS], [AC_MSG_NOTICE([ENABLE_STEP_DEFS defined])])
 
-# Check for cuc_selftest intent
-AC_ARG_ENABLE([cuc_selftest],
-    AS_HELP_STRING([--enable-cuc_selftest],
-        [Compile 'cuc_selftest' in src [default=yes]]),
-    [enable_cuc_selftest=$enableval],
-    [enable_cuc_selftest=yes])
+# Check for cucumber_selftest intent
+AC_ARG_ENABLE([cucumber_selftest],
+    AS_HELP_STRING([--enable-cucumber_selftest],
+        [Compile 'cucumber_selftest' in src [default=yes]]),
+    [enable_cucumber_selftest=$enableval],
+    [enable_cucumber_selftest=yes])
 
-AM_CONDITIONAL([ENABLE_CUC_SELFTEST], [test x$enable_cuc_selftest != xno])
-AM_COND_IF([ENABLE_CUC_SELFTEST], [AC_MSG_NOTICE([ENABLE_CUC_SELFTEST defined])])
+AM_CONDITIONAL([ENABLE_CUCUMBER_SELFTEST], [test x$enable_cucumber_selftest != xno])
+AM_COND_IF([ENABLE_CUCUMBER_SELFTEST], [AC_MSG_NOTICE([ENABLE_CUCUMBER_SELFTEST defined])])
 
 # Checks for library functions.
 AC_TYPE_SIGNAL
@@ -810,8 +816,8 @@ AM_CONDITIONAL([ENABLE_DRAFTS], [test x$enable_drafts != xno])
 
 if test "x$enable_drafts" = "xyes"; then
     AC_MSG_NOTICE([Building stable and legacy API + draft API])
-    AC_DEFINE(CUC_BUILD_DRAFT_API, 1, [Provide draft classes and methods])
-    AC_SUBST(pkg_config_defines, "-DCUC_BUILD_DRAFT_API=1")
+    AC_DEFINE(CUCUMBER_BUILD_DRAFT_API, 1, [Provide draft classes and methods])
+    AC_SUBST(pkg_config_defines, "-DCUCUMBER_BUILD_DRAFT_API=1")
 else
     AC_MSG_NOTICE([Building stable and legacy API (no draft API)])
     AC_SUBST(pkg_config_defines, "")
@@ -860,7 +866,7 @@ AS_IF([test "x$enable_Werror" = "xyes" || test "x$enable_Werror" = "xauto"],
 AC_CONFIG_FILES([Makefile
                  doc/Makefile
                  include/Makefile
-                 src/libcuc.pc
+                 src/libcucumber.pc
                 ])
 
 

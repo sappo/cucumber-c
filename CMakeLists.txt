@@ -27,7 +27,7 @@ set(pkg_config_names_private "")
 ########################################################################
 OPTION (ENABLE_DRAFTS "Build and install draft classes and methods" ON)
 IF (ENABLE_DRAFTS)
-    ADD_DEFINITIONS (-DCUC_BUILD_DRAFT_API)
+    ADD_DEFINITIONS (-DCUCUMBER_BUILD_DRAFT_API)
 ENDIF (ENABLE_DRAFTS)
 
 ########################################################################
@@ -129,9 +129,8 @@ ENDIF (CZMQ_FOUND)
 ########################################################################
 # GHERKIN dependency
 ########################################################################
-find_package(gherkin)
-option(CUC_WITH_GHERKIN "Build cuc with gherkin" ${GHERKIN_FOUND})
-IF (CUC_WITH_GHERKIN AND GHERKIN_FOUND)
+find_package(gherkin REQUIRED)
+IF (GHERKIN_FOUND)
     include_directories(${GHERKIN_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${GHERKIN_LIBRARIES})
   IF (PC_GHERKIN_FOUND)
@@ -140,16 +139,15 @@ IF (CUC_WITH_GHERKIN AND GHERKIN_FOUND)
   ELSE (PC_GHERKIN_FOUND)
       set(pkg_config_libs_private "${pkg_config_libs_private} -lgherkin")
   ENDIF (PC_GHERKIN_FOUND)
-    add_definitions(-DHAVE_GHERKIN)
-    list(APPEND OPTIONAL_LIBRARIES ${GHERKIN_LIBRARIES})
-ENDIF (CUC_WITH_GHERKIN AND GHERKIN_FOUND)
+ELSE (GHERKIN_FOUND)
+    message( FATAL_ERROR "gherkin not found." )
+ENDIF (GHERKIN_FOUND)
 
 ########################################################################
 # MATH dependency
 ########################################################################
-find_package(math)
-option(CUC_WITH_MATH "Build cuc with math" ${MATH_FOUND})
-IF (CUC_WITH_MATH AND MATH_FOUND)
+find_package(math REQUIRED)
+IF (MATH_FOUND)
     include_directories(${MATH_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${MATH_LIBRARIES})
   IF (PC_MATH_FOUND)
@@ -158,16 +156,15 @@ IF (CUC_WITH_MATH AND MATH_FOUND)
   ELSE (PC_MATH_FOUND)
       set(pkg_config_libs_private "${pkg_config_libs_private} -lm")
   ENDIF (PC_MATH_FOUND)
-    add_definitions(-DHAVE_MATH)
-    list(APPEND OPTIONAL_LIBRARIES ${MATH_LIBRARIES})
-ENDIF (CUC_WITH_MATH AND MATH_FOUND)
+ELSE (MATH_FOUND)
+    message( FATAL_ERROR "math not found." )
+ENDIF (MATH_FOUND)
 
 ########################################################################
 # CJSON dependency
 ########################################################################
-find_package(cjson)
-option(CUC_WITH_CJSON "Build cuc with cjson" ${CJSON_FOUND})
-IF (CUC_WITH_CJSON AND CJSON_FOUND)
+find_package(cjson REQUIRED)
+IF (CJSON_FOUND)
     include_directories(${CJSON_INCLUDE_DIRS})
     list(APPEND MORE_LIBRARIES ${CJSON_LIBRARIES})
   IF (PC_CJSON_FOUND)
@@ -176,30 +173,30 @@ IF (CUC_WITH_CJSON AND CJSON_FOUND)
   ELSE (PC_CJSON_FOUND)
       set(pkg_config_libs_private "${pkg_config_libs_private} -lcjson")
   ENDIF (PC_CJSON_FOUND)
-    add_definitions(-DHAVE_CJSON)
-    list(APPEND OPTIONAL_LIBRARIES ${CJSON_LIBRARIES})
-ENDIF (CUC_WITH_CJSON AND CJSON_FOUND)
+ELSE (CJSON_FOUND)
+    message( FATAL_ERROR "cjson not found." )
+ENDIF (CJSON_FOUND)
 
 ########################################################################
 # version
 ########################################################################
-set(CUC_VERSION_MAJOR 0)
-set(CUC_VERSION_MINOR 1)
-set(CUC_VERSION_PATCH 0)
-set(CUC_VERSION "${CUC_VERSION_MAJOR}.${CUC_VERSION_MINOR}.${CUC_VERSION_PATCH}")
-message(STATUS "Detected CUC Version - ${CUC_VERSION}")
+set(CUCUMBER_VERSION_MAJOR 0)
+set(CUCUMBER_VERSION_MINOR 1)
+set(CUCUMBER_VERSION_PATCH 0)
+set(CUCUMBER_VERSION "${CUCUMBER_VERSION_MAJOR}.${CUCUMBER_VERSION_MINOR}.${CUCUMBER_VERSION_PATCH}")
+message(STATUS "Detected CUCUMBER Version - ${CUCUMBER_VERSION}")
 
 
 ########################################################################
 # includes
 ########################################################################
-set (cuc_headers
-    include/cuc_library.h
+set (cucumber_headers
+    include/cucumber_library.h
     include/cucumber_c.h
 )
 
 IF (ENABLE_DRAFTS)
-    list(APPEND cuc_headers
+    list(APPEND cucumber_headers
         include/cuc_gherkin_doc.h
         include/cuc_pickle.h
         include/cucumber.h
@@ -207,8 +204,8 @@ IF (ENABLE_DRAFTS)
     )
 ENDIF (ENABLE_DRAFTS)
 
-source_group ("Header Files" FILES ${cuc_headers})
-install(FILES ${cuc_headers} DESTINATION include)
+source_group ("Header Files" FILES ${cucumber_headers})
+install(FILES ${cucumber_headers} DESTINATION include)
 
 ########################################################################
 # library
@@ -216,11 +213,11 @@ install(FILES ${cuc_headers} DESTINATION include)
 
 
 include_directories("${SOURCE_DIR}/src" "${SOURCE_DIR}/include" "${PROJECT_BINARY_DIR}")
-set (cuc_sources
+set (cucumber_sources
 )
 
 IF (ENABLE_DRAFTS)
-    list (APPEND cuc_sources
+    list (APPEND cucumber_sources
         src/cuc_gherkin_doc.c
         src/cuc_pickle.c
         src/cucumber.c
@@ -229,62 +226,62 @@ IF (ENABLE_DRAFTS)
 ENDIF (ENABLE_DRAFTS)
 
 IF (ENABLE_DRAFTS)
-    list (APPEND cuc_sources
-        src/cuc_private_selftest.c
+    list (APPEND cucumber_sources
+        src/cucumber_private_selftest.c
     )
 ENDIF (ENABLE_DRAFTS)
 
-source_group("Source Files" FILES ${cuc_sources})
+source_group("Source Files" FILES ${cucumber_sources})
 
 
-option(CUC_BUILD_SHARED "Whether or not to build the shared object" ON)
-option(CUC_BUILD_STATIC "Whether or not to build the static archive" ON)
+option(CUCUMBER_BUILD_SHARED "Whether or not to build the shared object" ON)
+option(CUCUMBER_BUILD_STATIC "Whether or not to build the static archive" ON)
 
-if (NOT CUC_BUILD_SHARED AND NOT CUC_BUILD_STATIC)
+if (NOT CUCUMBER_BUILD_SHARED AND NOT CUCUMBER_BUILD_STATIC)
   message(FATAL_ERROR "Neither static nor shared library build enabled")
 endif()
 
 IF (NOT MSVC)
   # avoid building everything twice for shared + static
   # only on *nix, as Windows needs different preprocessor defines in static builds
-  add_library (cuc_objects OBJECT ${cuc_sources})
-  set_property(TARGET cuc_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
+  add_library (cucumber_objects OBJECT ${cucumber_sources})
+  set_property(TARGET cucumber_objects PROPERTY POSITION_INDEPENDENT_CODE ON)
 ENDIF (NOT MSVC)
 
 # shared
-if (CUC_BUILD_SHARED)
+if (CUCUMBER_BUILD_SHARED)
   IF (APPLE)
-    add_library(cuc SHARED ${cuc_sources})
+    add_library(cucumber SHARED ${cucumber_sources})
   ELSE (APPLE)
     IF (MSVC)
-      add_library(cuc SHARED ${cuc_sources})
+      add_library(cucumber SHARED ${cucumber_sources})
     ELSE (MSVC)
-      add_library(cuc SHARED $<TARGET_OBJECTS:cuc_objects>)
+      add_library(cucumber SHARED $<TARGET_OBJECTS:cucumber_objects>)
     ENDIF (MSVC)
   ENDIF(APPLE)
 
-  set_target_properties (cuc PROPERTIES
+  set_target_properties (cucumber PROPERTIES
     PUBLIC_HEADER "${public_headers}"
-    DEFINE_SYMBOL "CUC_EXPORTS"
+    DEFINE_SYMBOL "CUCUMBER_EXPORTS"
     SOVERSION "0"
-    VERSION "${CUC_VERSION}"
+    VERSION "${CUCUMBER_VERSION}"
     COMPILE_DEFINITIONS "DLL_EXPORT"
-    OUTPUT_NAME "cuc"
+    OUTPUT_NAME "cucumber"
     PREFIX "lib"
   )
 
-  target_link_libraries(cuc
+  target_link_libraries(cucumber
     PUBLIC ${MORE_LIBRARIES}
   )
 
-  install(TARGETS cuc
-    EXPORT cuc-targets
+  install(TARGETS cucumber
+    EXPORT cucumber-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
     RUNTIME DESTINATION bin                # .dll file
   )
 
-  target_include_directories(cuc
+  target_include_directories(cucumber
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
       $<INSTALL_INTERFACE:include>
@@ -292,42 +289,42 @@ if (CUC_BUILD_SHARED)
 endif()
 
 # static
-if (CUC_BUILD_STATIC)
+if (CUCUMBER_BUILD_STATIC)
   IF (APPLE)
-    add_library(cuc-static STATIC ${cuc_sources})
+    add_library(cucumber-static STATIC ${cucumber_sources})
   ELSE (APPLE)
     IF (MSVC)
-      add_library(cuc-static STATIC ${cuc_sources})
+      add_library(cucumber-static STATIC ${cucumber_sources})
     ELSE (MSVC)
-      add_library(cuc-static STATIC $<TARGET_OBJECTS:cuc_objects>)
+      add_library(cucumber-static STATIC $<TARGET_OBJECTS:cucumber_objects>)
     ENDIF (MSVC)
   ENDIF (APPLE)
 
-  set_target_properties(cuc-static PROPERTIES
+  set_target_properties(cucumber-static PROPERTIES
     PUBLIC_HEADER "${public_headers}"
-    COMPILE_DEFINITIONS "CUC_STATIC"
-    OUTPUT_NAME "cuc"
+    COMPILE_DEFINITIONS "CUCUMBER_STATIC"
+    OUTPUT_NAME "cucumber"
     PREFIX "lib"
   )
 
-  target_link_libraries(cuc-static
+  target_link_libraries(cucumber-static
     PUBLIC ${MORE_LIBRARIES}
   )
 
-  install(TARGETS cuc-static
-    EXPORT cuc-targets
+  install(TARGETS cucumber-static
+    EXPORT cucumber-targets
     LIBRARY DESTINATION "lib${LIB_SUFFIX}" # .so file
     ARCHIVE DESTINATION "lib${LIB_SUFFIX}" # .lib file
     RUNTIME DESTINATION bin                # .dll file
   )
 
-  target_include_directories(cuc-static
+  target_include_directories(cucumber-static
     PUBLIC
       $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
       $<INSTALL_INTERFACE:include>
   )
-  target_compile_definitions(cuc-static
-    PUBLIC CUC_STATIC
+  target_compile_definitions(cucumber-static
+    PUBLIC CUCUMBER_STATIC
   )
 
 endif()
@@ -343,17 +340,17 @@ set (exec_prefix "\${prefix}")
 set (libdir "\${prefix}/lib${LIB_SUFFIX}")
 set (includedir "\${prefix}/include")
 IF (ENABLE_DRAFTS)
-    set (pkg_config_defines "-DCUC_BUILD_DRAFT_API=1")
+    set (pkg_config_defines "-DCUCUMBER_BUILD_DRAFT_API=1")
 ELSE (ENABLE_DRAFTS)
     set (pkg_config_defines "")
 ENDIF (ENABLE_DRAFTS)
 configure_file(
-    "${SOURCE_DIR}/src/libcuc.pc.in"
-    "${SOURCE_DIR}/src/libcuc.pc"
+    "${SOURCE_DIR}/src/libcucumber.pc.in"
+    "${SOURCE_DIR}/src/libcucumber.pc"
 @ONLY)
 
 install(
-    FILES "${SOURCE_DIR}/src/libcuc.pc"
+    FILES "${SOURCE_DIR}/src/libcucumber.pc"
     DESTINATION "lib${LIB_SUFFIX}/pkgconfig"
 )
 
@@ -362,27 +359,27 @@ install(
 ########################################################################
 include(CMakePackageConfigHelpers)
 if (WIN32)
-  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for cucConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR "CMake" CACHE STRING "install path for cucumberConfig.cmake")
 else()
   # GNUInstallDirs "DATADIR" wrong here; CMake search path wants "share".
-  set(CMAKECONFIG_INSTALL_DIR "share/cmake/cuc" CACHE STRING "install path for cucConfig.cmake")
+  set(CMAKECONFIG_INSTALL_DIR "share/cmake/cucumber" CACHE STRING "install path for cucumberConfig.cmake")
 endif()
 
 if (NOT CMAKE_VERSION VERSION_LESS 3.0)
-  export(EXPORT cuc-targets
-         FILE "${CMAKE_CURRENT_BINARY_DIR}/cucTargets.cmake")
+  export(EXPORT cucumber-targets
+         FILE "${CMAKE_CURRENT_BINARY_DIR}/cucumberTargets.cmake")
 endif()
 configure_package_config_file(builds/cmake/Config.cmake.in
-                              "${CMAKE_CURRENT_BINARY_DIR}/cucConfig.cmake"
+                              "${CMAKE_CURRENT_BINARY_DIR}/cucumberConfig.cmake"
                               INSTALL_DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cucConfigVersion.cmake
-                                 VERSION ${CUC_VERSION}
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/cucumberConfigVersion.cmake
+                                 VERSION ${CUCUMBER_VERSION}
                                  COMPATIBILITY AnyNewerVersion)
-install(EXPORT cuc-targets
-        FILE cucTargets.cmake
+install(EXPORT cucumber-targets
+        FILE cucumberTargets.cmake
         DESTINATION ${CMAKECONFIG_INSTALL_DIR})
-install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cucConfig.cmake
-              ${CMAKE_CURRENT_BINARY_DIR}/cucConfigVersion.cmake
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cucumberConfig.cmake
+              ${CMAKE_CURRENT_BINARY_DIR}/cucumberConfigVersion.cmake
               DESTINATION ${CMAKECONFIG_INSTALL_DIR})
 
 ########################################################################
@@ -392,21 +389,27 @@ add_executable(
     cucumber_runner
     "${SOURCE_DIR}/src/cucumber_runner.c"
 )
-if (TARGET cuc)
+if (TARGET cucumber)
 target_link_libraries(
     cucumber_runner
-    cuc
+    cucumber
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
+    ${GHERKIN_LIBRARIES}
+    ${MATH_LIBRARIES}
+    ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
 endif()
-if (NOT TARGET cuc AND TARGET cuc-static)
+if (NOT TARGET cucumber AND TARGET cucumber-static)
 target_link_libraries(
     cucumber_runner
-    cuc-static
+    cucumber-static
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
+    ${GHERKIN_LIBRARIES}
+    ${MATH_LIBRARIES}
+    ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
     ${OPTIONAL_LIBRARIES_STATIC}
 )
@@ -418,21 +421,27 @@ add_executable(
     step_defs
     "${SOURCE_DIR}/src/step_defs.c"
 )
-if (TARGET cuc)
+if (TARGET cucumber)
 target_link_libraries(
     step_defs
-    cuc
+    cucumber
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
+    ${GHERKIN_LIBRARIES}
+    ${MATH_LIBRARIES}
+    ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
 endif()
-if (NOT TARGET cuc AND TARGET cuc-static)
+if (NOT TARGET cucumber AND TARGET cucumber-static)
 target_link_libraries(
     step_defs
-    cuc-static
+    cucumber-static
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
+    ${GHERKIN_LIBRARIES}
+    ${MATH_LIBRARIES}
+    ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
     ${OPTIONAL_LIBRARIES_STATIC}
 )
@@ -441,24 +450,30 @@ install(TARGETS step_defs
     RUNTIME DESTINATION bin
 )
 add_executable(
-    cuc_selftest
-    "${SOURCE_DIR}/src/cuc_selftest.c"
+    cucumber_selftest
+    "${SOURCE_DIR}/src/cucumber_selftest.c"
 )
-if (TARGET cuc)
+if (TARGET cucumber)
 target_link_libraries(
-    cuc_selftest
-    cuc
+    cucumber_selftest
+    cucumber
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
+    ${GHERKIN_LIBRARIES}
+    ${MATH_LIBRARIES}
+    ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
 endif()
-if (NOT TARGET cuc AND TARGET cuc-static)
+if (NOT TARGET cucumber AND TARGET cucumber-static)
 target_link_libraries(
-    cuc_selftest
-    cuc-static
+    cucumber_selftest
+    cucumber-static
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
+    ${GHERKIN_LIBRARIES}
+    ${MATH_LIBRARIES}
+    ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
     ${OPTIONAL_LIBRARIES_STATIC}
 )
@@ -512,7 +527,7 @@ set_directory_properties(
 foreach(TEST_CLASS ${TEST_CLASSES})
     add_test(
         NAME ${TEST_CLASS}
-        COMMAND cuc_selftest --continue --verbose --test ${TEST_CLASS}
+        COMMAND cucumber_selftest --continue --verbose --test ${TEST_CLASS}
     )
     IF (WIN32 AND CMAKE_PREFIX_PATH)
 		file(TO_NATIVE_PATH "${CMAKE_PREFIX_PATH}" CMAKE_PREFIX_PATH_WIN)
@@ -549,12 +564,12 @@ set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
                     ${PROJECT_BINARY_DIR}/Testing
                     ${PROJECT_BINARY_DIR}/compile_commands.json
                     ${PROJECT_BINARY_DIR}/platform.h
-                    ${PROJECT_BINARY_DIR}/src/libcuc.pc
-                    ${PROJECT_BINARY_DIR}/src/libcuc.so
+                    ${PROJECT_BINARY_DIR}/src/libcucumber.pc
+                    ${PROJECT_BINARY_DIR}/src/libcucumber.so
                     ${PROJECT_BINARY_DIR}/src/cucumber-c_selftest
                     ${PROJECT_BINARY_DIR}/src/cucumber_runner
                     ${PROJECT_BINARY_DIR}/src/step_defs
-                    ${PROJECT_BINARY_DIR}/src/cuc_selftest
+                    ${PROJECT_BINARY_DIR}/src/cucumber_selftest
 )
 
 add_custom_command(
@@ -579,8 +594,8 @@ message (STATUS "  C compiler        :   ${CMAKE_C_COMPILER}")
 message (STATUS "  Debug C flags     :   ${CMAKE_C_FLAGS_DEBUG} ${CMAKE_C_FLAGS}")
 message (STATUS "  Release C flags   :   ${CMAKE_C_FLAGS_RELEASE} ${CMAKE_C_FLAGS}")
 message (STATUS "  Build type        :   ${CMAKE_BUILD_TYPE}")
-message (STATUS "  Static build      :   ${CUC_BUILD_STATIC}")
-message (STATUS "  Shared build      :   ${CUC_BUILD_SHARED}")
+message (STATUS "  Static build      :   ${CUCUMBER_BUILD_STATIC}")
+message (STATUS "  Shared build      :   ${CUCUMBER_BUILD_SHARED}")
 IF (ENABLE_DRAFTS)
 message (STATUS "  Draft API         :   Yes")
 ELSE (ENABLE_DRAFTS)

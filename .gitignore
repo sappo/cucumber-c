@@ -129,3 +129,6 @@ nbproject/
 
 # editor backups
 *~
+
+# Other
+.*cache*

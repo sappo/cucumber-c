@@ -10,11 +10,11 @@
     =========================================================================
 */
 
-#ifndef CUCUMBER_C_H_H_INCLUDED
-#define CUCUMBER_C_H_H_INCLUDED
+#ifndef CUCUMBER_C_H_INCLUDED
+#define CUCUMBER_C_H_INCLUDED
 
 //  Include the project library file
-#include "cuc_library.h"
+#include "cucumber_library.h"
 
 //  Add your own public definitions here, if you need them
 #define STEP_DEFS(name)\

@@ -122,7 +122,7 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list gherkin-dev >/
        (command -v brew >/dev/null 2>&1 && brew ls --versions gherkin >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
     cd tmp-deps
-    $CI_TIME git clone --quiet --depth 1  gherkin
+    $CI_TIME git clone --quiet --depth 1 https://github.com/cucumber/gherkin-c gherkin
     cd gherkin
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR
@@ -178,7 +178,7 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cjson-dev >/de
        (command -v brew >/dev/null 2>&1 && brew ls --versions cjson >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
     cd tmp-deps
-    $CI_TIME git clone --quiet --depth 1  cjson
+    $CI_TIME git clone --quiet --depth 1 https://github.com/davegamble/cjson cjson
     cd cjson
     CCACHE_BASEDIR=${PWD}
     export CCACHE_BASEDIR

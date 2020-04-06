@@ -19,27 +19,27 @@ extern "C" {
 
 //  @interface
 //  Create a new pickle
-CUC_EXPORT cuc_pickle_t *
+CUCUMBER_EXPORT cuc_pickle_t *
     pickle_new (const char *json);
 
 //  Destroy the pickle
-CUC_EXPORT void
+CUCUMBER_EXPORT void
     pickle_destroy (cuc_pickle_t **self_p);
 
 //  Gets the name of this pickle.
-CUC_EXPORT const char *
+CUCUMBER_EXPORT const char *
     pickle_name (cuc_pickle_t *self);
 
 //  Returns the first step for this pickle.
-CUC_EXPORT const char *
+CUCUMBER_EXPORT const char *
     pickle_first_step (cuc_pickle_t *self);
 
 //  Returns the next step for this pickle.
-CUC_EXPORT const char *
+CUCUMBER_EXPORT const char *
     pickle_next_step (cuc_pickle_t *self);
 
 //  Self test of this class
-CUC_EXPORT void
+CUCUMBER_EXPORT void
     cuc_pickle_test (bool verbose);
 
 //  @end

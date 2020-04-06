@@ -18,7 +18,7 @@
 @end
 */
 
-#include "cuc_classes.h"
+#include "cucumber_classes.h"
 
 #include <file_reader.h>
 #include <string_token_scanner.h>

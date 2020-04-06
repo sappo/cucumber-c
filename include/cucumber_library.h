@@ -15,69 +15,63 @@
     =========================================================================
 */
 
-#ifndef CUC_LIBRARY_H_INCLUDED
-#define CUC_LIBRARY_H_INCLUDED
+#ifndef CUCUMBER_LIBRARY_H_INCLUDED
+#define CUCUMBER_LIBRARY_H_INCLUDED
 
 //  Set up environment for the application
 
 //  External dependencies
 #include <czmq.h>
-#if defined (HAVE_GHERKIN)
 #include <compiler.h>
-#endif
-#if defined (HAVE_MATH)
 #include <math.h>
-#endif
-#if defined (HAVE_CJSON)
 #include <cjson/cJSON.h>
-#endif
 
-//  CUC version macros for compile-time API detection
-#define CUC_VERSION_MAJOR 0
-#define CUC_VERSION_MINOR 1
-#define CUC_VERSION_PATCH 0
+//  CUCUMBER version macros for compile-time API detection
+#define CUCUMBER_VERSION_MAJOR 0
+#define CUCUMBER_VERSION_MINOR 1
+#define CUCUMBER_VERSION_PATCH 0
 
-#define CUC_MAKE_VERSION(major, minor, patch) \
+#define CUCUMBER_MAKE_VERSION(major, minor, patch) \
     ((major) * 10000 + (minor) * 100 + (patch))
-#define CUC_VERSION \
-    CUC_MAKE_VERSION(CUC_VERSION_MAJOR, CUC_VERSION_MINOR, CUC_VERSION_PATCH)
+#define CUCUMBER_VERSION \
+    CUCUMBER_MAKE_VERSION(CUCUMBER_VERSION_MAJOR, CUCUMBER_VERSION_MINOR, CUCUMBER_VERSION_PATCH)
 
 #if defined (__WINDOWS__)
-#   if defined CUC_STATIC
-#       define CUC_EXPORT
-#   elif defined CUC_INTERNAL_BUILD
+#   if defined CUCUMBER_STATIC
+#       define CUCUMBER_EXPORT
+#   elif defined CUCUMBER_INTERNAL_BUILD
 #       if defined DLL_EXPORT
-#           define CUC_EXPORT __declspec(dllexport)
+#           define CUCUMBER_EXPORT __declspec(dllexport)
 #       else
-#           define CUC_EXPORT
+#           define CUCUMBER_EXPORT
 #       endif
-#   elif defined CUC_EXPORTS
-#       define CUC_EXPORT __declspec(dllexport)
+#   elif defined CUCUMBER_EXPORTS
+#       define CUCUMBER_EXPORT __declspec(dllexport)
 #   else
-#       define CUC_EXPORT __declspec(dllimport)
+#       define CUCUMBER_EXPORT __declspec(dllimport)
 #   endif
-#   define CUC_PRIVATE
+#   define CUCUMBER_PRIVATE
 #elif defined (__CYGWIN__)
-#   define CUC_EXPORT
-#   define CUC_PRIVATE
+#   define CUCUMBER_EXPORT
+#   define CUCUMBER_PRIVATE
 #else
 #   if (defined __GNUC__ && __GNUC__ >= 4) || defined __INTEL_COMPILER
-#       define CUC_PRIVATE __attribute__ ((visibility ("hidden")))
-#       define CUC_EXPORT __attribute__ ((visibility ("default")))
+#       define CUCUMBER_PRIVATE __attribute__ ((visibility ("hidden")))
+#       define CUCUMBER_EXPORT __attribute__ ((visibility ("default")))
 #   else
-#       define CUC_PRIVATE
-#       define CUC_EXPORT
+#       define CUCUMBER_PRIVATE
+#       define CUCUMBER_EXPORT
 #   endif
 #endif
 
 //  Project has no stable classes, so we build the draft API
-#undef  CUC_BUILD_DRAFT_API
-#define CUC_BUILD_DRAFT_API
+#undef  CUCUMBER_BUILD_DRAFT_API
+#define CUCUMBER_BUILD_DRAFT_API
 
 //  Opaque class structures to allow forward references
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
-#ifdef CUC_BUILD_DRAFT_API
+#ifdef CUCUMBER_BUILD_DRAFT_API
 typedef struct _cuc_gherkin_doc_t cuc_gherkin_doc_t;
 #define CUC_GHERKIN_DOC_T_DEFINED
 typedef struct _cuc_pickle_t cuc_pickle_t;
@@ -86,31 +80,31 @@ typedef struct _cucumber_t cucumber_t;
 #define CUCUMBER_T_DEFINED
 typedef struct _cucumber_step_def_t cucumber_step_def_t;
 #define CUCUMBER_STEP_DEF_T_DEFINED
-#endif // CUC_BUILD_DRAFT_API
+#endif // CUCUMBER_BUILD_DRAFT_API
 
 
 //  Public classes, each with its own header file
-#ifdef CUC_BUILD_DRAFT_API
+#ifdef CUCUMBER_BUILD_DRAFT_API
 #include "cuc_gherkin_doc.h"
 #include "cuc_pickle.h"
 #include "cucumber.h"
 #include "cucumber_step_def.h"
-#endif // CUC_BUILD_DRAFT_API
+#endif // CUCUMBER_BUILD_DRAFT_API
 
-#ifdef CUC_BUILD_DRAFT_API
+#ifdef CUCUMBER_BUILD_DRAFT_API
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 //  Self test for private classes
-CUC_EXPORT void
-    cuc_private_selftest (bool verbose, const char *subtest);
+CUCUMBER_EXPORT void
+    cucumber_private_selftest (bool verbose, const char *subtest);
 
 #ifdef __cplusplus
 }
 #endif
-#endif // CUC_BUILD_DRAFT_API
+#endif // CUCUMBER_BUILD_DRAFT_API
 
 #endif
 /*

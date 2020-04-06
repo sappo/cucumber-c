@@ -66,6 +66,48 @@ windows)
         cd ../../..
     fi
 
+    git clone --quiet --depth 1 https://github.com/cucumber/gherkin-c gherkin
+    cd gherkin
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    cmake --build . --config Release --target install
+    cd ../..
+
+    if [ -d "gherkin/bindings/jni" ]; then
+        cd gherkin/bindings/jni
+        ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
+        cd ../../..
+    fi
+
+    git clone --quiet --depth 1  math
+    cd math
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    cmake --build . --config Release --target install
+    cd ../..
+
+    if [ -d "math/bindings/jni" ]; then
+        cd math/bindings/jni
+        ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
+        cd ../../..
+    fi
+
+    git clone --quiet --depth 1 https://github.com/davegamble/cjson cjson
+    cd cjson
+    mkdir build
+    cd build
+    cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    cmake --build . --config Release --target install
+    cd ../..
+
+    if [ -d "cjson/bindings/jni" ]; then
+        cd cjson/bindings/jni
+        ./gradlew publishToMavenLocal -PbuildPrefix=$BUILD_PREFIX --info
+        cd ../../..
+    fi
+
     cd cucumber-c
     mkdir build
     cd build
@@ -313,7 +355,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         BASE_PWD=${PWD}
         echo "`date`: INFO: Building prerequisite 'gherkin' from Git repository..." >&2
         cd ./tmp-deps
-        $CI_TIME git clone --quiet --depth 1  gherkin
+        $CI_TIME git clone --quiet --depth 1 https://github.com/cucumber/gherkin-c gherkin
         cd ./gherkin
         CCACHE_BASEDIR=${PWD}
         export CCACHE_BASEDIR
@@ -336,9 +378,6 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         $CI_TIME make -j4
         $CI_TIME make install
         cd "${BASE_PWD}"
-        CONFIG_OPTS+=("--with-gherkin=yes")
-    else
-        CONFIG_OPTS+=("--with-gherkin=yes")
     fi
 
     # Start of recipe for dependency: math
@@ -372,9 +411,6 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         $CI_TIME make -j4
         $CI_TIME make install
         cd "${BASE_PWD}"
-        CONFIG_OPTS+=("--with-math=yes")
-    else
-        CONFIG_OPTS+=("--with-math=yes")
     fi
 
     # Start of recipe for dependency: cjson
@@ -385,7 +421,7 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         BASE_PWD=${PWD}
         echo "`date`: INFO: Building prerequisite 'cjson' from Git repository..." >&2
         cd ./tmp-deps
-        $CI_TIME git clone --quiet --depth 1  cjson
+        $CI_TIME git clone --quiet --depth 1 https://github.com/davegamble/cjson cjson
         cd ./cjson
         CCACHE_BASEDIR=${PWD}
         export CCACHE_BASEDIR
@@ -408,9 +444,6 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         $CI_TIME make -j4
         $CI_TIME make install
         cd "${BASE_PWD}"
-        CONFIG_OPTS+=("--with-cjson=yes")
-    else
-        CONFIG_OPTS+=("--with-cjson=yes")
     fi
 
     # Build and check this project; note that zprojects always have an autogen.sh

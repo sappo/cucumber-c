@@ -1,5 +1,5 @@
 /*  =========================================================================
-    cuc_classes - private header file
+    cucumber_classes - private header file
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.
@@ -14,8 +14,8 @@
     =========================================================================
 */
 
-#ifndef CUC_CLASSES_H_INCLUDED
-#define CUC_CLASSES_H_INCLUDED
+#ifndef CUCUMBER_CLASSES_H_INCLUDED
+#define CUCUMBER_CLASSES_H_INCLUDED
 
 //  Platform definitions, must come first
 #include "platform.h"
@@ -41,12 +41,12 @@
 
 
 //  *** To avoid double-definitions, only define if building without draft ***
-#ifndef CUC_BUILD_DRAFT_API
+#ifndef CUCUMBER_BUILD_DRAFT_API
 
 //  Self test for private classes
-CUC_PRIVATE void
-    cuc_private_selftest (bool verbose, const char *subtest);
+CUCUMBER_PRIVATE void
+    cucumber_private_selftest (bool verbose, const char *subtest);
 
-#endif // CUC_BUILD_DRAFT_API
+#endif // CUCUMBER_BUILD_DRAFT_API
 
 #endif

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    cuc_selftest.c - run selftests
+    cucumber_selftest.c - run selftests
 
     Runs all selftests.
 
@@ -18,7 +18,7 @@
     =========================================================================
 */
 
-#include "cuc_classes.h"
+#include "cucumber_classes.h"
 
 typedef struct {
     const char *testname;           // test name, can be called from command line this way
@@ -30,13 +30,13 @@ typedef struct {
 
 static test_item_t
 all_tests [] = {
-#ifdef CUC_BUILD_DRAFT_API
+#ifdef CUCUMBER_BUILD_DRAFT_API
 // Tests for draft public classes:
     { "cuc_gherkin_doc", cuc_gherkin_doc_test, false, true, NULL },
     { "cuc_pickle", cuc_pickle_test, false, true, NULL },
     { "cucumber", cucumber_test, false, true, NULL },
     { "cucumber_step_def", cucumber_step_def_test, false, true, NULL },
-#endif // CUC_BUILD_DRAFT_API
+#endif // CUCUMBER_BUILD_DRAFT_API
     {NULL, NULL, 0, 0, NULL}          //  Sentinel
 };
 
@@ -70,10 +70,10 @@ test_runall (bool verbose)
             continue;
         if (!item->subtest)
             item->test (verbose);
-#ifdef CUC_BUILD_DRAFT_API // selftest is still in draft
+#ifdef CUCUMBER_BUILD_DRAFT_API // selftest is still in draft
         else
-            cuc_private_selftest (verbose, item->subtest);
-#endif // CUC_BUILD_DRAFT_API
+            cucumber_private_selftest (verbose, item->subtest);
+#endif // CUCUMBER_BUILD_DRAFT_API
     }
 
     printf ("Tests passed OK\n");
@@ -113,7 +113,7 @@ main (int argc, char **argv)
     for (argn = 1; argn < argc; argn++) {
         if (streq (argv [argn], "--help")
         ||  streq (argv [argn], "-h")) {
-            puts ("cuc_selftest.c [options] ...");
+            puts ("cucumber_selftest.c [options] ...");
             puts ("  --verbose / -v         verbose test output");
             puts ("  --number / -n          report number of tests");
             puts ("  --list / -l            list all tests");
@@ -173,10 +173,10 @@ main (int argc, char **argv)
         printf ("Running cucumber-c test '%s'...\n", test->testname);
         if (!test->subtest)
             test->test (verbose);
-#ifdef CUC_BUILD_DRAFT_API // selftest is still in draft
+#ifdef CUCUMBER_BUILD_DRAFT_API // selftest is still in draft
         else
-            cuc_private_selftest (verbose, test->subtest);
-#endif // CUC_BUILD_DRAFT_API
+            cucumber_private_selftest (verbose, test->subtest);
+#endif // CUCUMBER_BUILD_DRAFT_API
     }
     else
         test_runall (verbose);

@@ -23,7 +23,7 @@ if [ "$BUILD_TYPE" == "default" ]; then
 elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ] && [ -z "$BINDING_OPTS" ]; then
     ( cd bindings/jni && TERM=dumb ./gradlew clean bintrayUpload -PisRelease -PbuildPrefix=/tmp/jni_build )
 elif [ "$BUILD_TYPE" == "bindings" ] && [ "$BINDING" == "jni" ] && [ "$BINDING_OPTS" == "android" ]; then
-    export CUCUMBER_C_DEPLOYMENT=bindings/jni/cuc-jni/android/cuc-android-*.jar
+    export CUCUMBER_C_DEPLOYMENT=bindings/jni/cucumber-jni/android/cucumber-android-*.jar
 else
     export CUCUMBER_C_DEPLOYMENT=""
 fi
