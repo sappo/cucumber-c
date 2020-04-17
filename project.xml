@@ -19,12 +19,6 @@
         repository = "https://github.com/cucumber/gherkin-c"
         test = "Compiler_new" />
 
-    <!-- Needs to be part of gherkin-c -->
-    <use project = "math" prefix = "m"
-        header = "math.h"
-        repository = ""
-        test = "sqrt" />
-
     <use project = "cJson"
          header = "cjson/cJSON.h"
          repository = "https://github.com/DaveGamble/cJSON"
