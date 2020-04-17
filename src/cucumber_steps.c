@@ -28,8 +28,11 @@ struct _cucumber_steps_t {
     bool terminated;            //  Did caller ask us to quit?
     bool verbose;               //  Verbose logging enabled?
     //  Declare properties
-    zsock_t *pickle_socket;
+    zsock_t *server_socket;
     cucumber_t *cucumber;
+    cucumber_state_constructor_fn *state_constructor;
+    cucumber_state_destructor_fn *state_destructor;
+    cucumber_register_step_defs_fn *register_step_defs;
     void *state;
 };
 
@@ -38,7 +41,7 @@ struct _cucumber_steps_t {
 //  Create a new cucumber_steps instance
 
 static cucumber_steps_t *
-cucumber_steps_new (zsock_t *pipe, cucumber_t *cucumber)
+cucumber_steps_new (zsock_t *pipe, void **args)
 {
     cucumber_steps_t *self = (cucumber_steps_t *) zmalloc (sizeof (cucumber_steps_t));
     assert (self);
@@ -48,12 +51,14 @@ cucumber_steps_new (zsock_t *pipe, cucumber_t *cucumber)
     self->poller = zpoller_new (self->pipe, NULL);
 
     //  Initialize properties
-    self->pickle_socket = zsock_new_pull ("@tcp://127.0.0.1:8888");
-    assert (self->pickle_socket);
+    self->server_socket = zsock_new_dealer ("@tcp://127.0.0.1:8888");
+    assert (self->server_socket);
 
-    zpoller_add (self->poller, self->pickle_socket);
+    self->state_constructor = (cucumber_state_constructor_fn *) args[0];
+    self->state_destructor = (cucumber_state_destructor_fn *) args[1];
+    self->register_step_defs = (cucumber_register_step_defs_fn *) args[2];
 
-    self->cucumber = cucumber;
+    zpoller_add (self->poller, self->server_socket);
     return self;
 }
 
@@ -69,7 +74,7 @@ cucumber_steps_destroy (cucumber_steps_t **self_p)
         cucumber_steps_t *self = *self_p;
 
         //  Free actor properties
-        zsock_destroy (&self->pickle_socket);
+        zsock_destroy (&self->server_socket);
         cucumber_destroy (&self->cucumber);
 
         //  Free object itself
@@ -113,28 +118,52 @@ cucumber_steps_stop (cucumber_steps_t *self)
 static void
 cucumber_steps_recv_pickle (cucumber_steps_t *self)
 {
-    char *pickle_json = zstr_recv (self->pickle_socket);
-    if (!pickle_json)
+    char *command = zstr_recv (self->server_socket);
+    if (!command)
         return;
 
-    cuc_pickle_t *pickle = pickle_new (pickle_json);
-    zstr_free (&pickle_json);
-    printf ("Scenario: %s\n", pickle_name (pickle));
-    const char *pickle_step = pickle_first_step (pickle);
-    while (pickle_step != NULL) {
+    if (streq (command, "START SCENARIO")) {
+        char *id = zstr_recv (self->server_socket);
+        void *state = NULL;
+        if (self->state_constructor) {
+            state = self->state_constructor ();
+        }
+        self->cucumber = cucumber_new (state, (cucumber_state_destructor_fn *) self->state_destructor);
+        self->register_step_defs (self->cucumber);
+        zsock_send (self->server_socket, "ss", "SCENARIO STARTED", id);
+        zstr_free (&id);
+        if (self->verbose)
+            printf ("Scenario started\n");
+    }
+    else
+    if (streq (command, "END SCENARIO")) {
+        char *id = zstr_recv (self->server_socket);
+        cucumber_destroy (&self->cucumber);
+        zsock_send (self->server_socket, "ss", "SCENARIO ENDED", id);
+        zstr_free (&id);
+        if (self->verbose)
+            printf ("Scenario ended\n");
+    }
+    else
+    if (streq (command, "RUN STEP")) {
+        char *id = zstr_recv (self->server_socket);
+        char *pickle_step = zstr_recv (self->server_socket);
         cucumber_step_def_t *step_def = cucumber_find_step_def (self->cucumber, pickle_step);
-        printf ("  Step: %s ", pickle_step);
         if (step_def) {
             cucumber_step_def_run (step_def, cucumber_state (self->cucumber));
-            printf ("(OK)\n");
+            zsock_send (self->server_socket, "sss", "STEP RAN", id, "OK");
         }
         else {
-            printf ("(Error: Step definition not found!)\n");
-            break;
+            zsock_send (self->server_socket,
+                        "sss", "STEP RAN", id, "Error: Step definition not found");
         }
-        pickle_step = pickle_next_step (pickle);
+        zstr_free (&id);
+        zstr_free (&pickle_step);
+        if (self->verbose)
+            printf ("Step ran\n");
     }
-    pickle_destroy (&pickle);
+
+    zstr_free (&command);
 }
 
 
@@ -170,7 +199,7 @@ cucumber_steps_recv_api (cucumber_steps_t *self)
 void
 cucumber_steps_actor (zsock_t *pipe, void *args)
 {
-    cucumber_steps_t * self = cucumber_steps_new (pipe, (cucumber_t *) args);
+    cucumber_steps_t * self = cucumber_steps_new (pipe, (void **) args);
     if (!self)
         return;          //  Interrupted
 
@@ -182,7 +211,7 @@ cucumber_steps_actor (zsock_t *pipe, void *args)
         if (which == self->pipe)
             cucumber_steps_recv_api (self);
         else
-        if (which == self->pickle_socket)
+        if (which == self->server_socket)
             cucumber_steps_recv_pickle (self);
     }
     cucumber_steps_destroy (&self);

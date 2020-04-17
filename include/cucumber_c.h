@@ -20,10 +20,11 @@
 #define STEP_DEFS(name, state_constructor, state_destructor)\
     void register_##name##_step_defs (cucumber_t *cucumber);\
     int main() {\
-        void *state = state_constructor ();\
-        cucumber_t *cucumber = cucumber_new (state, (cucumber_state_destructor_fn *) state_destructor);\
-        register_##name##_step_defs (cucumber);\
-        zactor_t *steps_runner = zactor_new (cucumber_steps_actor, cucumber);\
+        void *args[3];\
+        args[0] = state_constructor;\
+        args[1] = state_destructor;\
+        args[2] = register_##name##_step_defs;\
+        zactor_t *steps_runner = zactor_new (cucumber_steps_actor, args);\
         assert (steps_runner);\
         printf ("Terminate by pressing ctrl-d\n");\
         while (true) {\

@@ -26,6 +26,10 @@ CUCUMBER_EXPORT cuc_pickle_t *
 CUCUMBER_EXPORT void
     pickle_destroy (cuc_pickle_t **self_p);
 
+//  Gets the ID of this pickle.
+CUCUMBER_EXPORT const char *
+    pickle_id (cuc_pickle_t *self);
+
 //  Gets the name of this pickle.
 CUCUMBER_EXPORT const char *
     pickle_name (cuc_pickle_t *self);

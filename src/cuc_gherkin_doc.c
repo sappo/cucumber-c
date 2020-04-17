@@ -84,7 +84,7 @@ gherkin_document_new (const char *filename)
 
     if (self->valid) {
         self->gherkin_document_event = GherkinDocumentEvent_new (AstBuilder_get_result (builder, filename));
-    } 
+    }
     else {
         self->errors = zlist_new ();
         while (Parser_has_more_errors (parser)) {
@@ -133,7 +133,7 @@ gherkin_document_destroy (cuc_gherkin_doc_t **self_p)
 //  Returns true if the read feature file was valid, otherwise false.
 
 bool
-gherkin_document_valid (cuc_gherkin_doc_t *self) 
+gherkin_document_valid (cuc_gherkin_doc_t *self)
 {
     assert (self);
     return self->valid;
@@ -144,7 +144,7 @@ gherkin_document_valid (cuc_gherkin_doc_t *self)
 //  Returns a list of errors if document is not valid, otherwise NULL.
 
 zlist_t *
-gherkin_document_errors (cuc_gherkin_doc_t *self) 
+gherkin_document_errors (cuc_gherkin_doc_t *self)
 {
     assert (self);
     return self->errors;
@@ -161,8 +161,8 @@ gherkin_document_get_pickles (cuc_gherkin_doc_t *self)
     Compiler* compiler = Compiler_new();
     zlist_t *pickles = zlist_new ();
 
-    int rc = Compiler_compile (compiler, 
-                               self->gherkin_document_event->gherkin_document, 
+    int rc = Compiler_compile (compiler,
+                               self->gherkin_document_event->gherkin_document,
                                self->source_event->source);
     assert (rc == 0);
     while (Compiler_has_more_pickles (compiler)) {

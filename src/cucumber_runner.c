@@ -34,7 +34,7 @@ main (int argc, char *argv [])
     if (verbose)
         zsys_info ("cucumber_runner - ");
 
-    zsock_t *client = zsock_new_push (">tcp://127.0.0.1:8888");
+    zsock_t *client = zsock_new_dealer (">tcp://127.0.0.1:8888");
     assert (client);
 
     zclock_sleep (250);  // Wait until connected
@@ -45,6 +45,41 @@ main (int argc, char *argv [])
         zlist_t *pickles = gherkin_document_get_pickles (gherkin_document);
         char *pickle_json = zlist_first (pickles);
         while (pickle_json != NULL) {
+            cuc_pickle_t *pickle = pickle_new (pickle_json);
+            zstr_free (&pickle_json);
+
+            printf ("Scenario: %s\n", pickle_name (pickle));
+            zsock_send (client, "ss", "START SCENARIO", pickle_id (pickle));
+            char *command, *message;
+            zsock_recv (client, "ss", &command, &message);
+            assert (streq (command, "SCENARIO STARTED"));
+            assert (streq (message, pickle_id (pickle)));
+            zstr_free (&command);
+            zstr_free (&message);
+
+            const char *pickle_step = pickle_first_step (pickle);
+            while (pickle_step != NULL) {
+                printf ("  Step: %s ", pickle_step);
+                zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
+                char *result;
+                zsock_recv (client, "sss", &command, &message, &result);
+                assert (streq (command, "STEP RAN"));
+                assert (streq (message, pickle_id (pickle)));
+                printf ("(%s)\n", result);
+                zstr_free (&command);
+                zstr_free (&message);
+                zstr_free (&result);
+
+                pickle_step = pickle_next_step (pickle);
+            }
+            zsock_send (client, "ss", "END SCENARIO", pickle_id (pickle));
+            zsock_recv (client, "ss", &command, &message);
+            assert (streq (command, "SCENARIO ENDED"));
+            assert (streq (message, pickle_id (pickle)));
+            zstr_free (&command);
+            zstr_free (&message);
+
+            pickle_destroy (&pickle);
             zstr_send (client, pickle_json);
             pickle_json = zlist_next (pickles);
         }

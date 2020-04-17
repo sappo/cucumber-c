@@ -41,7 +41,8 @@ pickle_step_destroy (cuc_pickle_step_t **self_p)
 
 
 struct _cuc_pickle_t {
-    char *name;         //  Name of this pickle
+    char *id;            //  ID of this pickle
+    char *name;          //  Name of this pickle
     zlistx_t *steps;     //  Steps of this pickle
 };
 
@@ -55,7 +56,7 @@ pickle_new (const char *json)
     assert (json);
     if (strlen (json) == 0)
         return NULL;
-    
+
     cuc_pickle_t *self = (cuc_pickle_t *) zmalloc (sizeof (cuc_pickle_t));
     assert (self);
     //  Initialize class properties
@@ -65,6 +66,8 @@ pickle_new (const char *json)
     cJSON *pickle_json = cJSON_Parse(json);
 
     cJSON *pickle = cJSON_GetObjectItemCaseSensitive (pickle_json, "pickle");
+    cJSON *id = cJSON_GetObjectItemCaseSensitive (pickle, "id");
+    self->id = strdup (id->valuestring);
     cJSON *name = cJSON_GetObjectItemCaseSensitive (pickle, "name");
     self->name = strdup (name->valuestring);
 
@@ -92,12 +95,24 @@ pickle_destroy (cuc_pickle_t **self_p)
     if (*self_p) {
         cuc_pickle_t *self = *self_p;
         //  Free class properties
+        zstr_free (&self->id);
         zstr_free (&self->name);
         zlistx_destroy (&self->steps);
         //  Free object itself
         free (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Gets the ID of this pickle.
+
+const char *
+pickle_id (cuc_pickle_t *self)
+{
+    assert (self);
+    return self->name;
 }
 
 
