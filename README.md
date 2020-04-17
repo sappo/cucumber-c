@@ -79,7 +79,7 @@ STEP_DEFS(protocol, my_state_new, my_state_destroy) {
 
 Now compile and run your step definitions
 
-    gcc my_step_defs.c -o my_step_defs -l cucumber-c
+    gcc my_step_defs.c -o my_step_defs -l cucumber
     ./my_step_defs
 
 To run your feature file use the cucumber_runner:
