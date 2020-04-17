@@ -52,6 +52,10 @@ struct _cuc_pickle_t {
 cuc_pickle_t *
 pickle_new (const char *json)
 {
+    assert (json);
+    if (strlen (json) == 0)
+        return NULL;
+    
     cuc_pickle_t *self = (cuc_pickle_t *) zmalloc (sizeof (cuc_pickle_t));
     assert (self);
     //  Initialize class properties
@@ -161,7 +165,7 @@ cuc_pickle_test (bool verbose)
     //  @selftest
     //  Simple create/destroy test
     cuc_pickle_t *self = pickle_new ("");
-    assert (self);
+    assert (!self);
     pickle_destroy (&self);
     //  @end
     printf ("OK\n");
