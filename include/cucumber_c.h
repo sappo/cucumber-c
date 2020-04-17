@@ -21,36 +21,18 @@
     void register_##name##_step_defs (cucumber_t *cucumber);\
     static state_t state;\
     int main() {\
-        zsock_t *server = zsock_new_pull ("@tcp://127.0.0.1:8888");\
-        assert (server);\
-        cucumber_t *cucumber = cucumber_new ();\
         cucumber_t *cucumber = cucumber_new (NULL);\
         register_##name##_step_defs (cucumber);\
+        zactor_t *steps_runner = zactor_new (cucumber_steps_actor, cucumber);\
+        assert (steps_runner);\
+        printf ("Terminate by pressing ctrl-d\n");\
         while (true) {\
-            char *pickle_json = zstr_recv (server);\
-            if (!pickle_json)\
-                break;\
-            \
-            cuc_pickle_t *pickle = pickle_new (pickle_json);\
-            zstr_free (&pickle_json);\
-            printf ("Scenario: %s\n", pickle_name (pickle));\
-            const char *pickle_step = pickle_first_step (pickle);\
-            while (pickle_step != NULL) {\
-                cucumber_step_def_t *step_def = cucumber_find_step_def (cucumber, pickle_step);\
-                printf ("  Step: %s ", pickle_step);\
-                if (step_def) {\
-                    cucumber_step_def_run (step_def, (void *) &state);\
-                    printf ("(OK)\n");\
-                }\
-                else {\
-                    printf ("(Error: Step definition not found!)\n");\
-                    break;\
-                }\
-                pickle_step = pickle_next_step (pickle);\
-            }\
-            pickle_destroy (&pickle);\
+            if (feof(stdin)) break;\
+            int c = getc(stdin);\
+            if (c == EOF) break;\
         }\
-        zsock_destroy (&server);\
+        zstr_send (steps_runner, "$TERM");\
+        zactor_destroy (&steps_runner);\
         return 0;\
     }\
     \

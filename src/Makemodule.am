@@ -20,7 +20,8 @@ src_libcucumber_la_SOURCES += \
     src/cuc_gherkin_doc.c \
     src/cuc_pickle.c \
     src/cucumber.c \
-    src/cucumber_step_def.c
+    src/cucumber_step_def.c \
+    src/cucumber_steps.c
 
 endif
 
@@ -180,6 +181,13 @@ check-cucumber_step_def-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTES
 	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -v -t cucumber_step_def
 	$(MAKE) check-empty-selftest-rw
 
+check-cucumber_steps: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
+check-cucumber_steps-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -v -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
+
 
 # Run the selftest binary under valgrind to check for memory leaks
 memcheck: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
@@ -254,6 +262,20 @@ memcheck-cucumber_step_def-verbose: src/cucumber_selftest $(top_builddir)/$(SELF
 		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/cucumber_selftest -v -t cucumber_step_def
 	$(MAKE) check-empty-selftest-rw
+memcheck-cucumber_steps: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
+memcheck-cucumber_steps-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -v -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
 
 # Run the selftest binary under valgrind to check for performance leaks
 callcheck: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
@@ -308,6 +330,16 @@ callcheck-cucumber_step_def-verbose: src/cucumber_selftest $(top_builddir)/$(SEL
 		$(VALGRIND_OPTIONS) \
 		$(builddir)/src/cucumber_selftest -v -t cucumber_step_def
 	$(MAKE) check-empty-selftest-rw
+callcheck-cucumber_steps: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
+callcheck-cucumber_steps-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -v -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
 
 # Run the selftest binary under gdb for debugging
 debug: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
@@ -351,6 +383,14 @@ debug-cucumber_step_def: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW
 debug-cucumber_step_def-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
 		--args $(builddir)/src/cucumber_selftest -v -t cucumber_step_def
+	$(MAKE) check-empty-selftest-rw
+debug-cucumber_steps: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/cucumber_selftest -t cucumber_steps
+	$(MAKE) check-empty-selftest-rw
+debug-cucumber_steps-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/cucumber_selftest -v -t cucumber_steps
 	$(MAKE) check-empty-selftest-rw
 
 # Run the selftest binary with verbose switch for tracing

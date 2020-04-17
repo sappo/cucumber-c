@@ -33,6 +33,7 @@
     <main name = "cucumber_runner" />
     <main name = "step_defs" />
 
+    <actor name = "cucumber_steps" />
     <class name = "cuc_gherkin_doc" />
     <class name = "cuc_pickle" />
     <class name = "cucumber" />

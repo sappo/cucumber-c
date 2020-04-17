@@ -201,6 +201,7 @@ IF (ENABLE_DRAFTS)
         include/cuc_pickle.h
         include/cucumber.h
         include/cucumber_step_def.h
+        include/cucumber_steps.h
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -222,6 +223,7 @@ IF (ENABLE_DRAFTS)
         src/cuc_pickle.c
         src/cucumber.c
         src/cucumber_step_def.c
+        src/cucumber_steps.c
     )
 ENDIF (ENABLE_DRAFTS)
 
@@ -501,6 +503,7 @@ IF (ENABLE_DRAFTS)
     cuc_pickle
     cucumber
     cucumber_step_def
+    cucumber_steps
     )
 ENDIF (ENABLE_DRAFTS)
 

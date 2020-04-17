@@ -80,6 +80,8 @@ typedef struct _cucumber_t cucumber_t;
 #define CUCUMBER_T_DEFINED
 typedef struct _cucumber_step_def_t cucumber_step_def_t;
 #define CUCUMBER_STEP_DEF_T_DEFINED
+typedef struct _cucumber_steps_t cucumber_steps_t;
+#define CUCUMBER_STEPS_T_DEFINED
 #endif // CUCUMBER_BUILD_DRAFT_API
 
 
@@ -89,6 +91,7 @@ typedef struct _cucumber_step_def_t cucumber_step_def_t;
 #include "cuc_pickle.h"
 #include "cucumber.h"
 #include "cucumber_step_def.h"
+#include "cucumber_steps.h"
 #endif // CUCUMBER_BUILD_DRAFT_API
 
 #ifdef CUCUMBER_BUILD_DRAFT_API
