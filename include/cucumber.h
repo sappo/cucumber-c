@@ -18,15 +18,18 @@ extern "C" {
 #endif
 
 //  @interface
+//  Destructor for the state object
+typedef void (cucumber_state_destructor_fn) (void **);
+
 //  Create a new cucumber
 CUCUMBER_EXPORT cucumber_t *
-    cucumber_new (void *state);
+    cucumber_new (void *state, cucumber_state_destructor_fn state_destructor);
 
 //  Destroy the cucumber
 CUCUMBER_EXPORT void
     cucumber_destroy (cucumber_t **self_p);
 
-//  Returns the first matching step definition or NULL if no step definition 
+//  Returns the first matching step definition or NULL if no step definition
 //  matches.
 CUCUMBER_EXPORT cucumber_step_def_t *
     cucumber_find_step_def (cucumber_t *self, const char *text);

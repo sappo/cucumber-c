@@ -11,9 +11,30 @@
 */
 #include "cucumber_classes.h"
 
-typedef struct _my_state_t {
+struct _my_state_t {
     int filler;
-} my_state_t;
+};
+typedef struct _my_state_t my_state_t;
+
+my_state_t *
+my_state_new ()
+{
+    return (my_state_t *) zmalloc (sizeof (my_state_t));
+}
+
+void
+my_state_destroy (my_state_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        my_state_t *self = *self_p;
+        //  Free class properties
+        self->filler = 0;
+        //  Free object itself
+        free (self);
+        *self_p = NULL;
+    }
+}
 
 void
 given_a_topic (zrex_t *rex, void *state_p) {
@@ -29,7 +50,7 @@ when_message_is_sent (zrex_t *rex, void *state_p) {
     my_state_t *state = (my_state_t *) state_p;
 }
 
-STEP_DEFS(protocol, my_state_t) {
+STEP_DEFS(protocol, my_state_new, my_state_destroy) {
     GIVEN("a dafka (\\w+) subscribed to topic '(\\w+)'",
           given_a_topic)
 

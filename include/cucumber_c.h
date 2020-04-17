@@ -17,11 +17,11 @@
 #include "cucumber_library.h"
 
 //  Add your own public definitions here, if you need them
-#define STEP_DEFS(name, state_t)\
+#define STEP_DEFS(name, state_constructor, state_destructor)\
     void register_##name##_step_defs (cucumber_t *cucumber);\
-    static state_t state;\
     int main() {\
-        cucumber_t *cucumber = cucumber_new (NULL);\
+        void *state = state_constructor ();\
+        cucumber_t *cucumber = cucumber_new (state, (cucumber_state_destructor_fn *) state_destructor);\
         register_##name##_step_defs (cucumber);\
         zactor_t *steps_runner = zactor_new (cucumber_steps_actor, cucumber);\
         assert (steps_runner);\

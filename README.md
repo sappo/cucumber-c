@@ -29,9 +29,30 @@ To report an issue, use the [Cucumber-C issue tracker](https://github.com/sappo/
 You can define your step definitions as follows:
 
 ```C
-typedef struct _my_state_t {
+struct _my_state_t {
     int filler;
-} my_state_t;
+};
+typedef struct _my_state_t my_state_t;
+
+my_state_t *
+my_state_new ()
+{
+    return (my_state_t *) zmalloc (sizeof (my_state_t));
+}
+
+void
+my_state_destroy (my_state_t **self_p)
+{
+    assert (self_p);
+    if (*self_p) {
+        my_state_t *self = *self_p;
+        //  Free class properties
+        self->filler = 0;
+        //  Free object itself
+        free (self);
+        *self_p = NULL;
+    }
+}
 
 void
 given_a_topic (zrex_t *rex, void *state_p) {
@@ -47,7 +68,7 @@ when_message_is_sent (zrex_t *rex, void *state_p) {
     my_state_t *state = (my_state_t *) state_p;
 }
 
-STEP_DEFS(protocol, my_state_t) {
+STEP_DEFS(protocol, my_state_new, my_state_destroy) {
     GIVEN("a dafka (\\w+) subscribed to topic '(\\w+)'",
           given_a_topic)
 
@@ -58,7 +79,7 @@ STEP_DEFS(protocol, my_state_t) {
 
 Now compile and run your step definitions
 
-    gcc my_step_defs.c -o my_step_defs -l cucumber-c 
+    gcc my_step_defs.c -o my_step_defs -l cucumber-c
     ./my_step_defs
 
 To run your feature file use the cucumber_runner:
@@ -79,17 +100,17 @@ Before opening a pull request read our [contribution guidelines](https://github.
 
 ### Code Generation
 
-We generate scripts for build systems like autotools, cmake and others as well as class skeletons, class headers, the selftest runner and more using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image. 
+We generate scripts for build systems like autotools, cmake and others as well as class skeletons, class headers, the selftest runner and more using zproject. Generated files will have a header and footer telling you that this file was generated. To re-generate those files it is recommended to use the latest `zeromqorg/zproject` docker image.
 
 #### Docker
 
-* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as cucumber-c. 
-* Clone [czmq](https://github.com/zeromq/czqm) into the same directory as cucumber-c. 
+* Clone [libzmq](https://github.com/zeromq/libzmq) into the same directory as cucumber-c.
+* Clone [czmq](https://github.com/zeromq/czqm) into the same directory as cucumber-c.
 
-Next always download the latest image: 
+Next always download the latest image:
 
 ```sh
-# Make sure 
+# Make sure
 docker pull zeromqorg/zproject:latest
 ```
 
