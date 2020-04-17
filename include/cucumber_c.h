@@ -24,6 +24,7 @@
         zsock_t *server = zsock_new_pull ("@tcp://127.0.0.1:8888");\
         assert (server);\
         cucumber_t *cucumber = cucumber_new ();\
+        cucumber_t *cucumber = cucumber_new (NULL);\
         register_##name##_step_defs (cucumber);\
         while (true) {\
             char *pickle_json = zstr_recv (server);\

@@ -36,7 +36,7 @@ CUCUMBER_EXPORT bool
 
 //  Runs this step definition
 CUCUMBER_EXPORT void
-    cucumber_step_def_run (cucumber_step_def_t *self, void *opts);
+    cucumber_step_def_run (cucumber_step_def_t *self, void *state);
 
 //  Self test of this class
 CUCUMBER_EXPORT void

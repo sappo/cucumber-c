@@ -77,10 +77,10 @@ cucumber_step_def_matches (cucumber_step_def_t *self, const char *text)
 //  Runs this step definition
 
 void
-cucumber_step_def_run (cucumber_step_def_t *self, void *opts)
+cucumber_step_def_run (cucumber_step_def_t *self, void *state)
 {
     assert (self);
-    self->step (self->rex, opts);
+    self->step (self->rex, state);
 } 
 
 

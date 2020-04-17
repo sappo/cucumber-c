@@ -20,7 +20,7 @@ extern "C" {
 //  @interface
 //  Create a new cucumber
 CUCUMBER_EXPORT cucumber_t *
-    cucumber_new (void);
+    cucumber_new (void *state);
 
 //  Destroy the cucumber
 CUCUMBER_EXPORT void
@@ -34,6 +34,9 @@ CUCUMBER_EXPORT cucumber_step_def_t *
 //  Get the step definitions
 CUCUMBER_EXPORT zlistx_t *
     cucumber_get_step_defs (cucumber_t *self);
+
+CUCUMBER_EXPORT void *
+    cucumber_state (cucumber_t *self);
 
 //  Add a step definition
 CUCUMBER_EXPORT void

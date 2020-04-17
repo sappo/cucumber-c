@@ -23,6 +23,7 @@
 
 struct _cucumber_t {
     zlistx_t *step_defs;
+    void *state;
 };
 
 
@@ -30,11 +31,12 @@ struct _cucumber_t {
 //  Create a new cucumber
 
 cucumber_t *
-cucumber_new (void)
+cucumber_new (void *state)
 {
     cucumber_t *self = (cucumber_t *) zmalloc (sizeof (cucumber_t));
     assert (self);
 
+    self->state = state;
     self->step_defs = zlistx_new ();
     zlistx_set_destructor (self->step_defs, (zlistx_destructor_fn *) cucumber_step_def_destroy);
     return self;
@@ -51,11 +53,22 @@ cucumber_destroy (cucumber_t **self_p)
     if (*self_p) {
         cucumber_t *self = *self_p;
         //  Free class properties
+        self->state = NULL;
         zlistx_destroy (&self->step_defs);
         //  Free object itself
         free (self);
         *self_p = NULL;
     }
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns the first matching step definition or NULL if no step definition 
+
+void *
+cucumber_state (cucumber_t *self) {
+    assert (self);
+    return self->state;
 }
 
 
@@ -122,7 +135,7 @@ cucumber_test (bool verbose)
 
     //  @selftest
     //  Simple create/destroy test
-    cucumber_t *self = cucumber_new ();
+    cucumber_t *self = cucumber_new (NULL);
     assert (self);
     cucumber_destroy (&self);
     //  @end

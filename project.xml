@@ -1,5 +1,5 @@
 <project
-    name = "cucumber-c" 
+    name = "cucumber-c"
     description = "Cucumber implementation for C"
     prefix = "cucumber"
     script = "zproject.gsl"
@@ -14,7 +14,7 @@
 
     <use project = "czmq" />
 
-    <use project = "gherkin" 
+    <use project = "gherkin"
         header = "compiler.h"
         repository = "https://github.com/cucumber/gherkin-c"
         test = "Compiler_new" />
