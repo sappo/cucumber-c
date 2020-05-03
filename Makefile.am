@@ -10,11 +10,10 @@ AM_CPPFLAGS = \
     ${libzmq_CFLAGS} \
     ${czmq_CFLAGS} \
     ${gherkin_CFLAGS} \
-    ${math_CFLAGS} \
     ${cjson_CFLAGS} \
     -I$(srcdir)/include
 
-project_libs = ${libzmq_LIBS} ${czmq_LIBS} ${gherkin_LIBS} ${math_LIBS} ${cjson_LIBS}
+project_libs = ${libzmq_LIBS} ${czmq_LIBS} ${gherkin_LIBS} ${cjson_LIBS}
 
 SUBDIRS = doc
 SUBDIRS += include
@@ -38,7 +37,6 @@ EXTRA_DIST += \
     Findlibzmq.cmake \
     Findczmq.cmake \
     Findgherkin.cmake \
-    Findmath.cmake \
     Findcjson.cmake \
     builds/cmake/Modules/ClangFormat.cmake \
     builds/cmake/clang-format-check.sh.in \

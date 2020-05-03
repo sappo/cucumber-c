@@ -12,7 +12,6 @@ cd "$REPO_DIR/.."
 git clone --quiet --depth 1 https://github.com/zeromq/libzmq.git libzmq
 git clone --quiet --depth 1 https://github.com/zeromq/czmq.git czmq
 git clone --quiet --depth 1 https://github.com/cucumber/gherkin-c gherkin
-git clone --quiet --depth 1  math
 git clone --quiet --depth 1 https://github.com/davegamble/cjson cjson
 cd -
 

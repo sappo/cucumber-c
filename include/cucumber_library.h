@@ -23,7 +23,6 @@
 //  External dependencies
 #include <czmq.h>
 #include <compiler.h>
-#include <math.h>
 #include <cjson/cJSON.h>
 
 //  CUCUMBER version macros for compile-time API detection

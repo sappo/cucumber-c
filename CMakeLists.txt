@@ -150,23 +150,6 @@ ELSE (GHERKIN_FOUND)
 ENDIF (GHERKIN_FOUND)
 
 ########################################################################
-# MATH dependency
-########################################################################
-find_package(math REQUIRED)
-IF (MATH_FOUND)
-    include_directories(${MATH_INCLUDE_DIRS})
-    list(APPEND MORE_LIBRARIES ${MATH_LIBRARIES})
-  IF (PC_MATH_FOUND)
-      set(pkg_config_names_private "${pkg_config_names_private} math")
-      list(APPEND OPTIONAL_LIBRARIES_STATIC ${PC_MATH_STATIC_LDFLAGS})
-  ELSE (PC_MATH_FOUND)
-      set(pkg_config_libs_private "${pkg_config_libs_private} -lm")
-  ENDIF (PC_MATH_FOUND)
-ELSE (MATH_FOUND)
-    message( FATAL_ERROR "math not found." )
-ENDIF (MATH_FOUND)
-
-########################################################################
 # CJSON dependency
 ########################################################################
 find_package(cjson REQUIRED)
@@ -404,7 +387,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
     ${GHERKIN_LIBRARIES}
-    ${MATH_LIBRARIES}
     ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
@@ -416,7 +398,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
     ${GHERKIN_LIBRARIES}
-    ${MATH_LIBRARIES}
     ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
     ${OPTIONAL_LIBRARIES_STATIC}
@@ -436,7 +417,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
     ${GHERKIN_LIBRARIES}
-    ${MATH_LIBRARIES}
     ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
@@ -448,7 +428,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
     ${GHERKIN_LIBRARIES}
-    ${MATH_LIBRARIES}
     ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
     ${OPTIONAL_LIBRARIES_STATIC}
@@ -468,7 +447,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
     ${GHERKIN_LIBRARIES}
-    ${MATH_LIBRARIES}
     ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
 )
@@ -480,7 +458,6 @@ target_link_libraries(
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
     ${GHERKIN_LIBRARIES}
-    ${MATH_LIBRARIES}
     ${CJSON_LIBRARIES}
     ${OPTIONAL_LIBRARIES}
     ${OPTIONAL_LIBRARIES_STATIC}
