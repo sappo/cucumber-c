@@ -15,8 +15,11 @@
 
 //  Include the project library file
 #include "cucumber_library.h"
+#include "cucumber_asserts.h"
 
-//  Add your own public definitions here, if you need them
+//  Step Definition Macros
+//  -------------------------------------------------------------------------
+
 #define STEP_DEFS(name, state_constructor, state_destructor)\
     void register_##name##_step_defs (cucumber_t *cucumber);\
     int main() {\
@@ -49,7 +52,6 @@
 #define THEN(step_text, step_fun) STEP(step_text, step_fun)
 
 #define FETCH_PARAMS(...)\
-    zrex_fetch (rex, __VA_ARGS__, NULL);
-
+    zrex_fetch (cucumber_step_def_rex (self), __VA_ARGS__, NULL);
 
 #endif

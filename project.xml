@@ -31,6 +31,7 @@
     <class name = "cuc_gherkin_doc" />
     <class name = "cuc_pickle" />
     <class name = "cucumber" />
+    <class name = "cucumber_asserts" />
     <class name = "cucumber_step_def" />
 
     <target name ="travis" />

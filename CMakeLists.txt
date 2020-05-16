@@ -189,6 +189,7 @@ IF (ENABLE_DRAFTS)
         include/cuc_gherkin_doc.h
         include/cuc_pickle.h
         include/cucumber.h
+        include/cucumber_asserts.h
         include/cucumber_step_def.h
         include/cucumber_steps.h
     )
@@ -211,6 +212,7 @@ IF (ENABLE_DRAFTS)
         src/cuc_gherkin_doc.c
         src/cuc_pickle.c
         src/cucumber.c
+        src/cucumber_asserts.c
         src/cucumber_step_def.c
         src/cucumber_steps.c
     )
@@ -485,6 +487,7 @@ IF (ENABLE_DRAFTS)
     cuc_gherkin_doc
     cuc_pickle
     cucumber
+    cucumber_asserts
     cucumber_step_def
     cucumber_steps
     )

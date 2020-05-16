@@ -24,6 +24,7 @@
 struct _cucumber_step_def_t {
     zrex_t *rex;
     cucumber_step *step;
+    char *failed_str;
 };
 
 
@@ -53,6 +54,7 @@ cucumber_step_def_destroy (cucumber_step_def_t **self_p)
         cucumber_step_def_t *self = *self_p;
         //  Free class properties
         zrex_destroy (&self->rex);
+        zstr_free (&self->failed_str);
         //  Free object itself
         free (self);
         *self_p = NULL;
@@ -61,7 +63,7 @@ cucumber_step_def_destroy (cucumber_step_def_t **self_p)
 
 
 //  --------------------------------------------------------------------------
-//  Returns true if the text matches the previously compiled step expression, 
+//  Returns true if the text matches the previously compiled step expression,
 //  Otherwise false.
 
 bool
@@ -70,8 +72,17 @@ cucumber_step_def_matches (cucumber_step_def_t *self, const char *text)
     assert (self);
     assert (text);
     return zrex_matches (self->rex, text);
-} 
+}
 
+
+//  --------------------------------------------------------------------------
+
+zrex_t *
+cucumber_step_def_rex (cucumber_step_def_t *self)
+{
+    assert (self);
+    return self->rex;
+}
 
 //  --------------------------------------------------------------------------
 //  Runs this step definition
@@ -80,8 +91,41 @@ void
 cucumber_step_def_run (cucumber_step_def_t *self, void *state)
 {
     assert (self);
-    self->step (self->rex, state);
-} 
+    self->step (self, state);
+}
+
+
+//  --------------------------------------------------------------------------
+//  Sets the reason why the step failed
+
+void
+cucumber_step_def_set_failure_reason (cucumber_step_def_t *self, char *reason)
+{
+    assert (self);
+    self->failed_str = reason;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns true if the ran step def succeeded, Otherwise false.
+
+bool
+cucumber_step_def_failed (cucumber_step_def_t *self)
+{
+    assert (self);
+    return self->failed_str != NULL;
+}
+
+
+//  --------------------------------------------------------------------------
+//  Returns the reason of the failure, or NULL if ran did succeed.
+
+const char *
+cucumber_step_def_failure_reason (cucumber_step_def_t *self)
+{
+    assert (self);
+    return self->failed_str;
+}
 
 
 //  --------------------------------------------------------------------------

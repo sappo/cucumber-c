@@ -37,14 +37,14 @@ my_state_destroy (my_state_t **self_p)
 }
 
 void
-given_a_topic (zrex_t *rex, void *state_p) {
+given_a_topic (cucumber_step_def_t *self, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
     my_state_t *state = (my_state_t *) state_p;
 }
 
 void
-when_message_is_sent (zrex_t *rex, void *state_p) {
+when_message_is_sent (cucumber_step_def_t *self, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
     my_state_t *state = (my_state_t *) state_p;

@@ -11,6 +11,7 @@ include_HEADERS += \
     cuc_gherkin_doc.h \
     cuc_pickle.h \
     cucumber.h \
+    cucumber_asserts.h \
     cucumber_step_def.h \
     cucumber_steps.h
 

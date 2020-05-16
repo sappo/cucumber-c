@@ -35,6 +35,7 @@ all_tests [] = {
     { "cuc_gherkin_doc", cuc_gherkin_doc_test, false, true, NULL },
     { "cuc_pickle", cuc_pickle_test, false, true, NULL },
     { "cucumber", cucumber_test, false, true, NULL },
+    { "cucumber_asserts", cucumber_asserts_test, false, true, NULL },
     { "cucumber_step_def", cucumber_step_def_test, false, true, NULL },
     { "cucumber_steps", cucumber_steps_test, false, true, NULL },
 #endif // CUCUMBER_BUILD_DRAFT_API

@@ -63,9 +63,26 @@ main (int argc, char *argv [])
                 zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
                 char *result;
                 zsock_recv (client, "sss", &command, &message, &result);
-                assert (streq (command, "STEP RAN"));
                 assert (streq (message, pickle_id (pickle)));
-                printf ("(%s)\n", result);
+
+                if (streq (command, "STEP SUCCEEDED")) {
+                    printf ("(%s)\n", result);
+                }
+                else
+                if (streq (command, "STEP FAILED")) {
+                    printf ("(FAILURE)\n\n\t%s\n", result);
+                    break;
+                }
+                else
+                if (streq (command, "STEP ERRORED")) {
+                    printf ("(ERROR)\n\n\t%s\n", result);
+                    break;
+                }
+                else {
+                    printf ("(Unknown command: %s)\n", command);
+                    break;
+                }
+
                 zstr_free (&command);
                 zstr_free (&message);
                 zstr_free (&result);
@@ -82,6 +99,7 @@ main (int argc, char *argv [])
             pickle_destroy (&pickle);
             zstr_send (client, pickle_json);
             pickle_json = zlist_next (pickles);
+            printf ("\n");
         }
         zlist_destroy (&pickles);
     }
