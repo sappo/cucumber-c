@@ -126,7 +126,7 @@ cucumber_steps_recv_pickle (cucumber_steps_t *self)
         char *id = zstr_recv (self->server_socket);
         void *state = NULL;
         if (self->state_constructor) {
-            state = self->state_constructor ();
+            state = self->state_constructor (self->verbose);
         }
         self->cucumber = cucumber_new (state, (cucumber_state_destructor_fn *) self->state_destructor);
         self->register_step_defs (self->cucumber);

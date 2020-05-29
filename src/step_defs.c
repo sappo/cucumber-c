@@ -17,7 +17,7 @@ struct _my_state_t {
 typedef struct _my_state_t my_state_t;
 
 my_state_t *
-my_state_new ()
+my_state_new (bool verbose)
 {
     return (my_state_t *) zmalloc (sizeof (my_state_t));
 }

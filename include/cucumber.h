@@ -19,7 +19,7 @@ extern "C" {
 
 //  @interface
 //  Destructor for the state object
-typedef void * (cucumber_state_constructor_fn) ();
+typedef void * (cucumber_state_constructor_fn) (bool verbose);
 typedef void (cucumber_state_destructor_fn) (void **);
 typedef void (cucumber_register_step_defs_fn) (cucumber_t *);
 

@@ -22,12 +22,16 @@
 
 #define STEP_DEFS(name, state_constructor, state_destructor)\
     void register_##name##_step_defs (cucumber_t *cucumber);\
-    int main() {\
-        void *args[3];\
-        args[0] = state_constructor;\
-        args[1] = state_destructor;\
-        args[2] = register_##name##_step_defs;\
-        zactor_t *steps_runner = zactor_new (cucumber_steps_actor, args);\
+    int main(int argc, char** argv) {\
+        zargs_t *args = zargs_new (argc, argv);\
+        void *steps_args[3];\
+        steps_args[0] = state_constructor;\
+        steps_args[1] = state_destructor;\
+        steps_args[2] = register_##name##_step_defs;\
+        zactor_t *steps_runner = zactor_new (cucumber_steps_actor, steps_args);\
+        if (zargs_has (args, "--verbose")) {\
+            zstr_send (steps_runner, "VERBOSE");\
+        }\
         assert (steps_runner);\
         printf ("Terminate by pressing ctrl-d\n");\
         while (true) {\
