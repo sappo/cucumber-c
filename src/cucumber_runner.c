@@ -19,6 +19,11 @@
 
 #include "cucumber_classes.h"
 
+#define RED    "\x1B[31m"
+#define GREEN  "\x1B[32m"
+#define BLUE   "\x1B[34m"
+#define YELLOW "\033[33m"
+
 int
 main (int argc, char *argv [])
 {
@@ -48,7 +53,7 @@ main (int argc, char *argv [])
             cuc_pickle_t *pickle = pickle_new (pickle_json);
             zstr_free (&pickle_json);
 
-            printf ("Scenario: %s\n", pickle_name (pickle));
+            printf ("%sScenario: %s\n", YELLOW, pickle_name (pickle));
             zsock_send (client, "ss", "START SCENARIO", pickle_id (pickle));
             char *command, *message;
             zsock_recv (client, "ss", &command, &message);
@@ -59,23 +64,26 @@ main (int argc, char *argv [])
 
             const char *pickle_step = pickle_first_step (pickle);
             while (pickle_step != NULL) {
-                printf ("  Step: %s ", pickle_step);
+                printf ("%s  Step: %s\r", BLUE, pickle_step);
+				fflush (stdout);
                 zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
                 char *result;
                 zsock_recv (client, "sss", &command, &message, &result);
                 assert (streq (message, pickle_id (pickle)));
 
                 if (streq (command, "STEP SUCCEEDED")) {
-                    printf ("(%s)\n", result);
+                    puts (__to_string("%s  Step: %s (%s)", GREEN, pickle_step, result));
                 }
                 else
                 if (streq (command, "STEP FAILED")) {
-                    printf ("(FAILURE)\n\n\t%s\n", result);
+                    puts (__to_string("%s  Step: %s (FAILURE)", RED, pickle_step, result));
+                    printf ("\n\t%s\n", result);
                     break;
                 }
                 else
                 if (streq (command, "STEP ERRORED")) {
-                    printf ("(ERROR)\n\n\t%s\n", result);
+                    puts (__to_string("%s  Step: %s (ERROR)", RED, pickle_step, result));
+                    printf ("(ERROR)\n\t%s\n", result);
                     break;
                 }
                 else {
