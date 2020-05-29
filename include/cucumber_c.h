@@ -24,6 +24,10 @@
     void register_##name##_step_defs (cucumber_t *cucumber);\
     int main(int argc, char** argv) {\
         zargs_t *args = zargs_new (argc, argv);\
+        if (zargs_hasx (args, "--help", "-h", NULL)) {\
+            printf ("Usage: %s_step_defs [--verbose]\n", "" #name "");\
+            return 0;\
+        }\
         void *steps_args[3];\
         steps_args[0] = state_constructor;\
         steps_args[1] = state_destructor;\
