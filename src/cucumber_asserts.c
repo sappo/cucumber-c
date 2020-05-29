@@ -62,7 +62,14 @@ __compare_implementation(long, "%l")
 __compare_implementation(float, "%f")
 __compare_implementation(double, "%f")
 __compare_implementation(size_t, "%zu")
-
+__compare_implementation(int8_t, "%zu")
+__compare_implementation(int16_t, "%zu")
+__compare_implementation(int32_t, "%zu")
+__compare_implementation(int64_t, "%zu")
+__compare_implementation(uint8_t, "%zu")
+__compare_implementation(uint16_t, "%zu")
+__compare_implementation(uint32_t, "%zu")
+__compare_implementation(uint64_t, "%zu")
 
 void
 cucumber_asserts_test (bool verbose)
