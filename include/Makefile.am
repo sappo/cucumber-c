@@ -14,6 +14,7 @@ include_HEADERS += \
     cucumber.h \
     cucumber_asserts.h \
     cucumber_step_def.h \
+    cucumber_steps_args.h \
     cucumber_steps.h
 
 endif

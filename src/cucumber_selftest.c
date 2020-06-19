@@ -38,6 +38,7 @@ all_tests [] = {
     { "cucumber", cucumber_test, false, true, NULL },
     { "cucumber_asserts", cucumber_asserts_test, false, true, NULL },
     { "cucumber_step_def", cucumber_step_def_test, false, true, NULL },
+    { "cucumber_steps_args", cucumber_steps_args_test, false, true, NULL },
     { "cucumber_steps", cucumber_steps_test, false, true, NULL },
 #endif // CUCUMBER_BUILD_DRAFT_API
     {NULL, NULL, 0, 0, NULL}          //  Sentinel

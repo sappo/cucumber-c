@@ -46,6 +46,8 @@ cucumber_steps_new (zsock_t *pipe, void **args)
     cucumber_steps_t *self = (cucumber_steps_t *) zmalloc (sizeof (cucumber_steps_t));
     assert (self);
 
+    cucumber_steps_args_t *steps_args = (cucumber_steps_args_t *) &args;
+
     self->pipe = pipe;
     self->terminated = false;
     self->poller = zpoller_new (self->pipe, NULL);
@@ -54,9 +56,9 @@ cucumber_steps_new (zsock_t *pipe, void **args)
     self->server_socket = zsock_new_dealer ("@tcp://127.0.0.1:8888");
     assert (self->server_socket);
 
-    self->state_constructor = (cucumber_state_constructor_fn *) args[0];
-    self->state_destructor = (cucumber_state_destructor_fn *) args[1];
-    self->register_step_defs = (cucumber_register_step_defs_fn *) args[2];
+    self->state_constructor = cucumber_steps_args_state_constructor_fn (steps_args);
+    self->state_destructor = cucumber_steps_args_state_destructor_fn (steps_args);
+    self->register_step_defs = cucumber_steps_args_register_step_defs_fn (steps_args);
 
     zpoller_add (self->poller, self->server_socket);
     return self;
@@ -83,35 +85,6 @@ cucumber_steps_destroy (cucumber_steps_t **self_p)
         *self_p = NULL;
     }
 }
-
-
-//  Start this actor. Return a value greater or equal to zero if initialization
-//  was successful. Otherwise -1.
-
-static int
-cucumber_steps_start (cucumber_steps_t *self)
-{
-    assert (self);
-
-    //  TODO: Add startup actions
-
-    return 0;
-}
-
-
-//  Stop this actor. Return a value greater or equal to zero if stopping
-//  was successful. Otherwise -1.
-
-static int
-cucumber_steps_stop (cucumber_steps_t *self)
-{
-    assert (self);
-
-    //  TODO: Add shutdown actions
-
-    return 0;
-}
-
 
 //  Here we handle incoming message from the cucumber runner
 

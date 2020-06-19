@@ -33,7 +33,7 @@ __to_string (const char *format, ...)
     size_t needed = vsnprintf (0, 0, format, argptr);
     va_end (argptr);
 
-    char *buffer = zmalloc (needed + 1);
+    char *buffer = (char *) zmalloc (needed + 1);
 
     va_start (argptr, format);
     vsnprintf (buffer, needed + 1, format, argptr);

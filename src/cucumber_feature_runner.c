@@ -72,7 +72,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
     if (gherkin_document_valid (self->gherkin_document)) {
         bool isSuccessful = true;
         zlist_t *pickles = gherkin_document_get_pickles (self->gherkin_document);
-        char *pickle_json = zlist_first (pickles);
+        char *pickle_json = (char *) zlist_first (pickles);
         while (pickle_json != NULL) {
             cuc_pickle_t *pickle = pickle_new (pickle_json);
             zstr_free (&pickle_json);
@@ -133,7 +133,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
 
             pickle_destroy (&pickle);
             zstr_send (client, pickle_json);
-            pickle_json = zlist_next (pickles);
+            pickle_json = (char *) zlist_next (pickles);
             printf ("\n");
         }
         zlist_destroy (&pickles);

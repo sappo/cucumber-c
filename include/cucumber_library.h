@@ -83,6 +83,8 @@ typedef struct _cucumber_asserts_t cucumber_asserts_t;
 #define CUCUMBER_ASSERTS_T_DEFINED
 typedef struct _cucumber_step_def_t cucumber_step_def_t;
 #define CUCUMBER_STEP_DEF_T_DEFINED
+typedef struct _cucumber_steps_args_t cucumber_steps_args_t;
+#define CUCUMBER_STEPS_ARGS_T_DEFINED
 typedef struct _cucumber_steps_t cucumber_steps_t;
 #define CUCUMBER_STEPS_T_DEFINED
 #endif // CUCUMBER_BUILD_DRAFT_API
@@ -96,6 +98,7 @@ typedef struct _cucumber_steps_t cucumber_steps_t;
 #include "cucumber.h"
 #include "cucumber_asserts.h"
 #include "cucumber_step_def.h"
+#include "cucumber_steps_args.h"
 #include "cucumber_steps.h"
 #endif // CUCUMBER_BUILD_DRAFT_API
 

@@ -21,10 +21,10 @@
 //  -------------------------------------------------------------------------
 
 #define CREATE_STEP_RUNNER_ACTOR(name, state_constructor, state_destructor)\
-    void *name##_steps_args[3];\
-    name##_steps_args[0] = state_constructor;\
-    name##_steps_args[1] = state_destructor;\
-    name##_steps_args[2] = register_##name##_step_defs;\
+    cucumber_steps_args_t *name##_steps_args = cucumber_steps_args_new (\
+            (cucumber_state_constructor_fn *) state_constructor,\
+            (cucumber_state_destructor_fn *) state_destructor,\
+            (cucumber_register_step_defs_fn *) register_##name##_step_defs);\
     zactor_t *name##_steps_runner = zactor_new (cucumber_steps_actor, name##_steps_args);\
     if (zargs_has (args, "--verbose")) {\
         zstr_send (name##_steps_runner, "VERBOSE");\

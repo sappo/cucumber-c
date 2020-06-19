@@ -41,6 +41,7 @@ given_a_topic (cucumber_step_def_t *self, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
     my_state_t *state = (my_state_t *) state_p;
+    state->filler = 1;
 }
 
 void
@@ -48,6 +49,7 @@ when_message_is_sent (cucumber_step_def_t *self, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
     my_state_t *state = (my_state_t *) state_p;
+    state->filler = 2;
 }
 
 STEP_DEFS(protocol, my_state_new, my_state_destroy) {

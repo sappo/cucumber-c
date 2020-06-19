@@ -192,6 +192,7 @@ IF (ENABLE_DRAFTS)
         include/cucumber.h
         include/cucumber_asserts.h
         include/cucumber_step_def.h
+        include/cucumber_steps_args.h
         include/cucumber_steps.h
     )
 ENDIF (ENABLE_DRAFTS)
@@ -216,6 +217,7 @@ IF (ENABLE_DRAFTS)
         src/cucumber.c
         src/cucumber_asserts.c
         src/cucumber_step_def.c
+        src/cucumber_steps_args.c
         src/cucumber_steps.c
     )
 ENDIF (ENABLE_DRAFTS)
@@ -492,6 +494,7 @@ IF (ENABLE_DRAFTS)
     cucumber
     cucumber_asserts
     cucumber_step_def
+    cucumber_steps_args
     cucumber_steps
     )
 ENDIF (ENABLE_DRAFTS)
