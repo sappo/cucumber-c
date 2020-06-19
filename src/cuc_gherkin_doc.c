@@ -173,6 +173,7 @@ gherkin_document_get_pickles (cuc_gherkin_doc_t *self)
         zlist_append (pickles, pickle_json);
         Event_delete (pickle_event);
     }
+    Compiler_delete (compiler);
     return pickles;
 }
 

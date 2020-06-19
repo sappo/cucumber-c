@@ -72,7 +72,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
     if (gherkin_document_valid (self->gherkin_document)) {
         bool isSuccessful = true;
         zlist_t *pickles = gherkin_document_get_pickles (self->gherkin_document);
-        char *pickle_json = (char *) zlist_first (pickles);
+        char *pickle_json = (char *) zlist_pop (pickles);
         while (pickle_json != NULL) {
             cuc_pickle_t *pickle = pickle_new (pickle_json);
             zstr_free (&pickle_json);
@@ -96,18 +96,24 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
                 assert (streq (message, pickle_id (pickle)));
 
                 if (streq (command, "STEP SUCCEEDED")) {
-                    puts (__to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT));
+                    char *output = __to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT);
+                    puts (output);
+                    zstr_free (&output);
                 }
                 else
                 if (streq (command, "STEP FAILED")) {
-                    puts (__to_string("%s  Step: %s (FAILURE)%s", RED, pickle_step, DEFAULT));
+                    char *output = __to_string("%s  Step: %s (FAILURE)%s", RED, pickle_step, DEFAULT);
+                    puts (output);
+                    zstr_free (&output);
                     printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
                     isSuccessful = false;
                     break;
                 }
                 else
                 if (streq (command, "STEP ERRORED")) {
-                    puts (__to_string("%s  Step: %s (ERROR)%s", RED, pickle_step, DEFAULT));
+                    char *output = __to_string("%s  Step: %s (ERROR)%s", RED, pickle_step, DEFAULT);
+                    puts (output);
+                    zstr_free (&output);
                     printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
                     isSuccessful = false;
                     break;
