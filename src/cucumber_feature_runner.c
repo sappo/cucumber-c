@@ -66,10 +66,11 @@ cucumber_feature_runner_destroy (cucumber_feature_runner_t **self_p)
 //  --------------------------------------------------------------------------
 //  Runs the scenario in the given feature file.
 
-void
+bool
 cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
 {
     if (gherkin_document_valid (self->gherkin_document)) {
+        bool isSuccessful = true;
         zlist_t *pickles = gherkin_document_get_pickles (self->gherkin_document);
         char *pickle_json = zlist_first (pickles);
         while (pickle_json != NULL) {
@@ -101,16 +102,19 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
                 if (streq (command, "STEP FAILED")) {
                     puts (__to_string("%s  Step: %s (FAILURE)%s", RED, pickle_step, DEFAULT));
                     printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
+                    isSuccessful = false;
                     break;
                 }
                 else
                 if (streq (command, "STEP ERRORED")) {
                     puts (__to_string("%s  Step: %s (ERROR)%s", RED, pickle_step, DEFAULT));
                     printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
+                    isSuccessful = false;
                     break;
                 }
                 else {
                     printf ("\n\n%s(Unknown command: %s)%s\n", RED, command, DEFAULT);
+                    isSuccessful = false;
                     break;
                 }
 
@@ -133,6 +137,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
             printf ("\n");
         }
         zlist_destroy (&pickles);
+        return isSuccessful;
     }
     else {
         printf ("Unable to parse feature file\n");
@@ -142,6 +147,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
             printf ("[ERROR] %s\n", error);
             error = (const char *) zlist_first (errors);
         }
+        return false;
     }
 }
 
