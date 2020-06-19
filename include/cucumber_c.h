@@ -26,6 +26,7 @@
             (cucumber_state_destructor_fn *) state_destructor,\
             (cucumber_register_step_defs_fn *) register_##name##_step_defs);\
     zactor_t *name##_steps_runner = zactor_new (cucumber_steps_actor, name##_steps_args);\
+    cucumber_steps_args_destroy (&name##_steps_args);\
     if (zargs_has (args, "--verbose")) {\
         zstr_send (name##_steps_runner, "VERBOSE");\
     }\
