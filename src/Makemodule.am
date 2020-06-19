@@ -17,6 +17,7 @@ src_libcucumber_la_SOURCES = \
 
 if ENABLE_DRAFTS
 src_libcucumber_la_SOURCES += \
+    src/cucumber_feature_runner.c \
     src/cuc_gherkin_doc.c \
     src/cuc_pickle.c \
     src/cucumber.c \
@@ -154,6 +155,13 @@ check-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_bu
 	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+check-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
+check-cucumber_feature_runner-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -v -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
+
 check-cuc_gherkin_doc: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -t cuc_gherkin_doc
 	$(MAKE) check-empty-selftest-rw
@@ -214,6 +222,20 @@ memcheck-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top
 		$(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+memcheck-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
+memcheck-cucumber_feature_runner-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -v -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
 memcheck-cuc_gherkin_doc: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
@@ -312,6 +334,16 @@ callcheck-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(to
 		$(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+callcheck-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
+callcheck-cucumber_feature_runner-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -v -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
 callcheck-cuc_gherkin_doc: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
 		$(VALGRIND_OPTIONS) \
@@ -384,6 +416,14 @@ debug-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_bu
 		--args $(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+debug-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/cucumber_selftest -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
+debug-cucumber_feature_runner-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/cucumber_selftest -v -t cucumber_feature_runner
+	$(MAKE) check-empty-selftest-rw
 debug-cuc_gherkin_doc: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
 		--args $(builddir)/src/cucumber_selftest -t cuc_gherkin_doc

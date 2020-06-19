@@ -32,6 +32,7 @@ static test_item_t
 all_tests [] = {
 #ifdef CUCUMBER_BUILD_DRAFT_API
 // Tests for draft public classes:
+    { "cucumber_feature_runner", cucumber_feature_runner_test, false, true, NULL },
     { "cuc_gherkin_doc", cuc_gherkin_doc_test, false, true, NULL },
     { "cuc_pickle", cuc_pickle_test, false, true, NULL },
     { "cucumber", cucumber_test, false, true, NULL },

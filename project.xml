@@ -28,6 +28,7 @@
     <main name = "step_defs" />
 
     <actor name = "cucumber_steps" />
+    <class name = "cucumber_feature_runner" />
     <class name = "cuc_gherkin_doc" />
     <class name = "cuc_pickle" />
     <class name = "cucumber" />

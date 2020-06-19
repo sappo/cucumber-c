@@ -8,6 +8,7 @@ include_HEADERS = \
 
 if ENABLE_DRAFTS
 include_HEADERS += \
+    cucumber_feature_runner.h \
     cuc_gherkin_doc.h \
     cuc_pickle.h \
     cucumber.h \

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    pickle - class description
+    pickle - Reads a pickle JSON and exposes pickle steps
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.

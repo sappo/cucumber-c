@@ -71,6 +71,8 @@
 //  These classes are stable or legacy and built in all releases
 //  Draft classes are by default not built in stable releases
 #ifdef CUCUMBER_BUILD_DRAFT_API
+typedef struct _cucumber_feature_runner_t cucumber_feature_runner_t;
+#define CUCUMBER_FEATURE_RUNNER_T_DEFINED
 typedef struct _cuc_gherkin_doc_t cuc_gherkin_doc_t;
 #define CUC_GHERKIN_DOC_T_DEFINED
 typedef struct _cuc_pickle_t cuc_pickle_t;
@@ -88,6 +90,7 @@ typedef struct _cucumber_steps_t cucumber_steps_t;
 
 //  Public classes, each with its own header file
 #ifdef CUCUMBER_BUILD_DRAFT_API
+#include "cucumber_feature_runner.h"
 #include "cuc_gherkin_doc.h"
 #include "cuc_pickle.h"
 #include "cucumber.h"

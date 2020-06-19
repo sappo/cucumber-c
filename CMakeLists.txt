@@ -186,6 +186,7 @@ set (cucumber_headers
 
 IF (ENABLE_DRAFTS)
     list(APPEND cucumber_headers
+        include/cucumber_feature_runner.h
         include/cuc_gherkin_doc.h
         include/cuc_pickle.h
         include/cucumber.h
@@ -209,6 +210,7 @@ set (cucumber_sources
 
 IF (ENABLE_DRAFTS)
     list (APPEND cucumber_sources
+        src/cucumber_feature_runner.c
         src/cuc_gherkin_doc.c
         src/cuc_pickle.c
         src/cucumber.c
@@ -484,6 +486,7 @@ set(TEST_CLASSES
 
 IF (ENABLE_DRAFTS)
     list (APPEND TEST_CLASSES
+    cucumber_feature_runner
     cuc_gherkin_doc
     cuc_pickle
     cucumber

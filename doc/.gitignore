@@ -11,6 +11,8 @@
 *.xml7
 
 # Ignore the source doc texts generated from program sources
+cucumber_feature_runner.txt
+cucumber_feature_runner.doc
 cuc_gherkin_doc.txt
 cuc_gherkin_doc.doc
 cuc_pickle.txt

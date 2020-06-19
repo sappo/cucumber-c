@@ -1,5 +1,5 @@
 /*  =========================================================================
-
+    cucumber_asserts - Assert that work within cucumber step definitions
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.

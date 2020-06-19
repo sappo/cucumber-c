@@ -1,5 +1,5 @@
 /*  =========================================================================
-    gherkin_document - class description
+    gherkin_document - Reads feature files and exposes scenarios as pickles
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.

@@ -1,5 +1,5 @@
 /*  =========================================================================
-    cucumber - class description
+    cucumber - Cucumber in C
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.

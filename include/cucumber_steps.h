@@ -1,5 +1,5 @@
 /*  =========================================================================
-    cucumber_steps -
+    cucumber_steps - Actor to execute a set of step definitions
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.

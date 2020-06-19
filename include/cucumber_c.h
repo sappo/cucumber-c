@@ -20,6 +20,17 @@
 //  Step Definition Macros
 //  -------------------------------------------------------------------------
 
+#define CREATE_STEP_RUNNER_ACTOR(name, state_constructor, state_destructor)\
+    void *name##_steps_args[3];\
+    name##_steps_args[0] = state_constructor;\
+    name##_steps_args[1] = state_destructor;\
+    name##_steps_args[2] = register_##name##_step_defs;\
+    zactor_t *name##_steps_runner = zactor_new (cucumber_steps_actor, name##_steps_args);\
+    if (zargs_has (args, "--verbose")) {\
+        zstr_send (name##_steps_runner, "VERBOSE");\
+    }\
+    assert (name##_steps_runner);
+
 #define STEP_DEFS(name, state_constructor, state_destructor)\
     void register_##name##_step_defs (cucumber_t *cucumber);\
     int main(int argc, char** argv) {\
@@ -28,26 +39,17 @@
             printf ("Usage: %s_step_defs [--verbose]\n", "" #name "");\
             return 0;\
         }\
-        void *steps_args[3];\
-        steps_args[0] = state_constructor;\
-        steps_args[1] = state_destructor;\
-        steps_args[2] = register_##name##_step_defs;\
-        zactor_t *steps_runner = zactor_new (cucumber_steps_actor, steps_args);\
-        if (zargs_has (args, "--verbose")) {\
-            zstr_send (steps_runner, "VERBOSE");\
-        }\
-        assert (steps_runner);\
+        CREATE_STEP_RUNNER_ACTOR(name, state_constructor, state_destructor)\
         printf ("Terminate by pressing ctrl-d\n");\
         while (true) {\
             if (feof(stdin)) break;\
             int c = getc(stdin);\
             if (c == EOF) break;\
         }\
-        zstr_send (steps_runner, "$TERM");\
-        zactor_destroy (&steps_runner);\
+        zstr_send (name##_steps_runner, "$TERM");\
+        zactor_destroy (&name##_steps_runner);\
         return 0;\
     }\
-    \
     void register_##name##_step_defs (cucumber_t *cucumber)
 
 #define STEP(step_text, step_fun) {\

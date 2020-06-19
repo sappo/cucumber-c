@@ -1,5 +1,5 @@
 /*  =========================================================================
-    cucumber_step_def - class description
+    cucumber_step_def - Runs a single step definition
 
     Copyright (c) the Contributors as noted in the AUTHORS file. This
     file is part of cucumber-c.
