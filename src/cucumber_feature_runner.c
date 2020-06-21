@@ -75,7 +75,6 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
         char *pickle_json = (char *) zlist_first (pickles);
         while (pickle_json != NULL) {
             cuc_pickle_t *pickle = pickle_new (pickle_json);
-            zstr_free (&pickle_json);
 
             printf ("%sScenario: %s%s\n", YELLOW, pickle_name (pickle), DEFAULT);
             zsock_send (client, "ss", "START SCENARIO", pickle_id (pickle));
