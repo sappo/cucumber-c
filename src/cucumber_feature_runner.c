@@ -89,7 +89,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
             const char *pickle_step = pickle_first_step (pickle);
             while (pickle_step != NULL) {
                 printf ("%s  Step: %s%s\r", BLUE, pickle_step, DEFAULT);
-				fflush (stdout);
+                fflush (stdout);
                 zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
                 char *result;
                 zsock_recv (client, "sss", &command, &message, &result);
@@ -138,7 +138,6 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
             zstr_free (&message);
 
             pickle_destroy (&pickle);
-            zstr_send (client, pickle_json);
             pickle_json = (char *) zlist_next (pickles);
             printf ("\n");
         }
