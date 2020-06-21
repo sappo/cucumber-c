@@ -168,9 +168,7 @@ gherkin_document_get_pickles (cuc_gherkin_doc_t *self)
     while (Compiler_has_more_pickles (compiler)) {
         const Event* pickle_event = (const Event *) PickleEvent_new (Compiler_next_pickle (compiler));
 
-        char *pickle_json = s_event_to_string (pickle_event);
-
-        zlist_append (pickles, pickle_json);
+        zlist_append (pickles, s_event_to_string (pickle_event));
         Event_delete (pickle_event);
     }
     Compiler_delete (compiler);
