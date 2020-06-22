@@ -54,7 +54,7 @@ s_event_to_string (const Event *event)
     size_t len;
     stream = open_memstream (&string, &len);
     Event_print (event, stream);
-    fflush (stream);
+    fclose (stream);
 
     return string;
 }
