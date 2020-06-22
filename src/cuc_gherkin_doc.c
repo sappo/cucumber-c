@@ -160,7 +160,6 @@ gherkin_document_get_pickles (cuc_gherkin_doc_t *self)
     assert (self);
     Compiler* compiler = Compiler_new();
     zlist_t *pickles = zlist_new ();
-    zlist_autofree (pickles);
 
     int rc = Compiler_compile (compiler,
                                self->gherkin_document_event->gherkin_document,
