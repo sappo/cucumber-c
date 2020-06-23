@@ -28,7 +28,7 @@
 //  Structure of our class
 
 struct _cucumber_feature_runner_t {
-    cuc_gherkin_doc_t *gherkin_document;
+    zlist_t *feature_files;
 };
 
 
@@ -41,7 +41,23 @@ cucumber_feature_runner_new (const char *filename)
     cucumber_feature_runner_t *self = (cucumber_feature_runner_t *) zmalloc (sizeof (cucumber_feature_runner_t));
     assert (self);
     //  Initialize class properties
-    self->gherkin_document = gherkin_document_new (filename);
+    self->feature_files = zlist_new ();
+    if (zfile_is_directory (zfile_new (NULL, filename))) {
+        zdir_t *feature_directory = zdir_new (filename, NULL);
+        zlist_t *files = zdir_list (feature_directory);
+        zfile_t *file = (zfile_t *) zlist_first (files);
+        while (file) {
+            const char *filename = zfile_filename (file, NULL);
+            if (strstr (filename, ".feature")) {
+                zlist_append (self->feature_files, strdup (filename));
+            }
+            file = (zfile_t *) zlist_next (files);
+        }
+        zlist_destroy (&files);
+    }
+    else {
+        zlist_append (self->feature_files, strdup (filename));
+    }
     return self;
 }
 
@@ -56,7 +72,7 @@ cucumber_feature_runner_destroy (cucumber_feature_runner_t **self_p)
     if (*self_p) {
         cucumber_feature_runner_t *self = *self_p;
         //  Free class properties here
-        gherkin_document_destroy (&self->gherkin_document);
+        zlist_destroy (&self->feature_files);
         //  Free object itself
         free (self);
         *self_p = NULL;
@@ -69,91 +85,97 @@ cucumber_feature_runner_destroy (cucumber_feature_runner_t **self_p)
 bool
 cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
 {
-    if (gherkin_document_valid (self->gherkin_document)) {
-        bool isSuccessful = true;
-        zlist_t *pickles = gherkin_document_get_pickles (self->gherkin_document);
-        char *pickle_json = (char *) zlist_first (pickles);
-        while (pickle_json != NULL) {
-            cuc_pickle_t *pickle = pickle_new (pickle_json);
-            zstr_free (&pickle_json);
+    bool isSuccessful = true;
+    char *featurefile = (char *) zlist_first (self->feature_files);
+    while (featurefile) {
+        cuc_gherkin_doc_t *gherkin_document = gherkin_document_new (featurefile);
+        if (gherkin_document_valid (gherkin_document)) {
+            zlist_t *pickles = gherkin_document_get_pickles (gherkin_document);
+            char *pickle_json = (char *) zlist_first (pickles);
+            while (pickle_json != NULL) {
+                cuc_pickle_t *pickle = pickle_new (pickle_json);
+                zstr_free (&pickle_json);
 
-            printf ("%sScenario: %s%s\n", YELLOW, pickle_name (pickle), DEFAULT);
-            zsock_send (client, "ss", "START SCENARIO", pickle_id (pickle));
-            char *command, *message;
-            zsock_recv (client, "ss", &command, &message);
-            assert (streq (command, "SCENARIO STARTED"));
-            assert (streq (message, pickle_id (pickle)));
-            zstr_free (&command);
-            zstr_free (&message);
-
-            const char *pickle_step = pickle_first_step (pickle);
-            while (pickle_step != NULL) {
-                printf ("%s  Step: %s%s\r", BLUE, pickle_step, DEFAULT);
-                fflush (stdout);
-                zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
-                char *result;
-                zsock_recv (client, "sss", &command, &message, &result);
+                printf ("%sScenario: %s%s\n", YELLOW, pickle_name (pickle), DEFAULT);
+                zsock_send (client, "ss", "START SCENARIO", pickle_id (pickle));
+                char *command, *message;
+                zsock_recv (client, "ss", &command, &message);
+                assert (streq (command, "SCENARIO STARTED"));
                 assert (streq (message, pickle_id (pickle)));
-
-                if (streq (command, "STEP SUCCEEDED")) {
-                    char *output = __to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT);
-                    puts (output);
-                    zstr_free (&output);
-                }
-                else
-                if (streq (command, "STEP FAILED")) {
-                    char *output = __to_string("%s  Step: %s (FAILURE)%s", RED, pickle_step, DEFAULT);
-                    puts (output);
-                    zstr_free (&output);
-                    printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
-                    isSuccessful = false;
-                    break;
-                }
-                else
-                if (streq (command, "STEP ERRORED")) {
-                    char *output = __to_string("%s  Step: %s (ERROR)%s", RED, pickle_step, DEFAULT);
-                    puts (output);
-                    zstr_free (&output);
-                    printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
-                    isSuccessful = false;
-                    break;
-                }
-                else {
-                    printf ("\n\n%s(Unknown command: %s)%s\n", RED, command, DEFAULT);
-                    isSuccessful = false;
-                    break;
-                }
-
                 zstr_free (&command);
                 zstr_free (&message);
-                zstr_free (&result);
 
-                pickle_step = pickle_next_step (pickle);
+                const char *pickle_step = pickle_first_step (pickle);
+                while (pickle_step != NULL) {
+                    printf ("%s  Step: %s%s\r", BLUE, pickle_step, DEFAULT);
+                    fflush (stdout);
+                    zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
+                    char *result;
+                    zsock_recv (client, "sss", &command, &message, &result);
+                    assert (streq (message, pickle_id (pickle)));
+
+                    if (streq (command, "STEP SUCCEEDED")) {
+                        char *output = __to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT);
+                        puts (output);
+                        zstr_free (&output);
+                    }
+                    else
+                    if (streq (command, "STEP FAILED")) {
+                        char *output = __to_string("%s  Step: %s (FAILURE)%s", RED, pickle_step, DEFAULT);
+                        puts (output);
+                        zstr_free (&output);
+                        printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
+                        isSuccessful = false;
+                        break;
+                    }
+                    else
+                    if (streq (command, "STEP ERRORED")) {
+                        char *output = __to_string("%s  Step: %s (ERROR)%s", RED, pickle_step, DEFAULT);
+                        puts (output);
+                        zstr_free (&output);
+                        printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
+                        isSuccessful = false;
+                        break;
+                    }
+                    else {
+                        printf ("\n\n%s(Unknown command: %s)%s\n", RED, command, DEFAULT);
+                        isSuccessful = false;
+                        break;
+                    }
+
+                    zstr_free (&command);
+                    zstr_free (&message);
+                    zstr_free (&result);
+
+                    pickle_step = pickle_next_step (pickle);
+                }
+                zsock_send (client, "ss", "END SCENARIO", pickle_id (pickle));
+                zsock_recv (client, "ss", &command, &message);
+                assert (streq (command, "SCENARIO ENDED"));
+                assert (streq (message, pickle_id (pickle)));
+                zstr_free (&command);
+                zstr_free (&message);
+
+                pickle_destroy (&pickle);
+                pickle_json = (char *) zlist_next (pickles);
+                printf ("\n");
             }
-            zsock_send (client, "ss", "END SCENARIO", pickle_id (pickle));
-            zsock_recv (client, "ss", &command, &message);
-            assert (streq (command, "SCENARIO ENDED"));
-            assert (streq (message, pickle_id (pickle)));
-            zstr_free (&command);
-            zstr_free (&message);
+            zlist_destroy (&pickles);
+        }
+        else {
+            printf ("Unable to parse feature file\n");
+            zlist_t *errors = gherkin_document_errors (gherkin_document);
+            const char *error = (const char *) zlist_first (errors);
+            while (error) {
+                printf ("[ERROR] %s\n", error);
+                error = (const char *) zlist_first (errors);
+            }
+        }
+        gherkin_document_destroy (&gherkin_document);
 
-            pickle_destroy (&pickle);
-            pickle_json = (char *) zlist_next (pickles);
-            printf ("\n");
-        }
-        zlist_destroy (&pickles);
-        return isSuccessful;
+        featurefile = (char *) zlist_next (self->feature_files);
     }
-    else {
-        printf ("Unable to parse feature file\n");
-        zlist_t *errors = gherkin_document_errors (self->gherkin_document);
-        const char *error = (const char *) zlist_first (errors);
-        while (error) {
-            printf ("[ERROR] %s\n", error);
-            error = (const char *) zlist_first (errors);
-        }
-        return false;
-    }
+    return isSuccessful;
 }
 
 //  --------------------------------------------------------------------------
