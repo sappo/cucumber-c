@@ -62,6 +62,7 @@ fi
 
 # Clone and build dependencies
 [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
+
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
        (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
@@ -85,11 +86,22 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/
         $CI_TIME autoconf || \
         $CI_TIME autoreconf -fiv
     fi
-    $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-    $CI_TIME make -j4
-    $CI_TIME make install
+    if [ -e ./configure ]; then
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+    else
+        mkdir build
+        cd build
+        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    fi
+    if [ -e ./configure ]; then
+        $CI_TIME make -j4
+        $CI_TIME make install
+    else
+        $CI_TIME cmake --build . --config Release --target install
+    fi
     cd "${BASE_PWD}"
 fi
+
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libczmq-dev >/dev/null 2>&1) || \
        (command -v brew >/dev/null 2>&1 && brew ls --versions czmq >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
@@ -113,11 +125,22 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libczmq-dev >/
         $CI_TIME autoconf || \
         $CI_TIME autoreconf -fiv
     fi
-    $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-    $CI_TIME make -j4
-    $CI_TIME make install
+    if [ -e ./configure ]; then
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+    else
+        mkdir build
+        cd build
+        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    fi
+    if [ -e ./configure ]; then
+        $CI_TIME make -j4
+        $CI_TIME make install
+    else
+        $CI_TIME cmake --build . --config Release --target install
+    fi
     cd "${BASE_PWD}"
 fi
+
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list gherkin-dev >/dev/null 2>&1) || \
        (command -v brew >/dev/null 2>&1 && brew ls --versions gherkin >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
@@ -141,11 +164,22 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list gherkin-dev >/
         $CI_TIME autoconf || \
         $CI_TIME autoreconf -fiv
     fi
-    $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-    $CI_TIME make -j4
-    $CI_TIME make install
+    if [ -e ./configure ]; then
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+    else
+        mkdir build
+        cd build
+        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    fi
+    if [ -e ./configure ]; then
+        $CI_TIME make -j4
+        $CI_TIME make install
+    else
+        $CI_TIME cmake --build . --config Release --target install
+    fi
     cd "${BASE_PWD}"
 fi
+
 if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cjson-dev >/dev/null 2>&1) || \
        (command -v brew >/dev/null 2>&1 && brew ls --versions cjson >/dev/null 2>&1)); then
     BASE_PWD=${PWD}
@@ -169,11 +203,22 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cjson-dev >/de
         $CI_TIME autoconf || \
         $CI_TIME autoreconf -fiv
     fi
-    $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-    $CI_TIME make -j4
-    $CI_TIME make install
+    if [ -e ./configure ]; then
+        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+    else
+        mkdir build
+        cd build
+        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+    fi
+    if [ -e ./configure ]; then
+        $CI_TIME make -j4
+        $CI_TIME make install
+    else
+        $CI_TIME cmake --build . --config Release --target install
+    fi
     cd "${BASE_PWD}"
 fi
+
 
 cd ../..
 

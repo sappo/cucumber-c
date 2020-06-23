@@ -294,9 +294,19 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-        $CI_TIME make -j4
-        $CI_TIME make install
+        if [ -e ./configure ]; then
+            $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        else
+            mkdir build
+            cd build
+            $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        fi
+        if [ -e ./configure ]; then
+            $CI_TIME make -j4
+            $CI_TIME make install
+        else
+            $CI_TIME cmake --build . --config Release --target install
+        fi
         cd "${BASE_PWD}"
     fi
 
@@ -327,9 +337,19 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-        $CI_TIME make -j4
-        $CI_TIME make install
+        if [ -e ./configure ]; then
+            $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        else
+            mkdir build
+            cd build
+            $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        fi
+        if [ -e ./configure ]; then
+            $CI_TIME make -j4
+            $CI_TIME make install
+        else
+            $CI_TIME cmake --build . --config Release --target install
+        fi
         cd "${BASE_PWD}"
     fi
 
@@ -360,9 +380,19 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-        $CI_TIME make -j4
-        $CI_TIME make install
+        if [ -e ./configure ]; then
+            $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        else
+            mkdir build
+            cd build
+            $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        fi
+        if [ -e ./configure ]; then
+            $CI_TIME make -j4
+            $CI_TIME make install
+        else
+            $CI_TIME cmake --build . --config Release --target install
+        fi
         cd "${BASE_PWD}"
     fi
 
@@ -393,9 +423,19 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             $CI_TIME autoconf || \
             $CI_TIME autoreconf -fiv
         fi
-        $CI_TIME ./configure "${CONFIG_OPTS[@]}"
-        $CI_TIME make -j4
-        $CI_TIME make install
+        if [ -e ./configure ]; then
+            $CI_TIME ./configure "${CONFIG_OPTS[@]}"
+        else
+            mkdir build
+            cd build
+            $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        fi
+        if [ -e ./configure ]; then
+            $CI_TIME make -j4
+            $CI_TIME make install
+        else
+            $CI_TIME cmake --build . --config Release --target install
+        fi
         cd "${BASE_PWD}"
     fi
 
