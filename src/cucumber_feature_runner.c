@@ -36,14 +36,15 @@ struct _cucumber_feature_runner_t {
 //  Create a new cucumber_feature_runner
 
 cucumber_feature_runner_t *
-cucumber_feature_runner_new (const char *filename)
+cucumber_feature_runner_new (const char *fileOrDirname)
 {
     cucumber_feature_runner_t *self = (cucumber_feature_runner_t *) zmalloc (sizeof (cucumber_feature_runner_t));
     assert (self);
     //  Initialize class properties
     self->feature_files = zlist_new ();
-    if (zfile_is_directory (zfile_new (NULL, filename))) {
-        zdir_t *feature_directory = zdir_new (filename, NULL);
+    zfile_t *featureFileOrDirectory = zfile_new (NULL, fileOrDirname);
+    if (zfile_is_directory (featureFileOrDirectory)) {
+        zdir_t *feature_directory = zdir_new (fileOrDirname, NULL);
         zlist_t *files = zdir_list (feature_directory);
         zfile_t *file = (zfile_t *) zlist_first (files);
         while (file) {
@@ -54,10 +55,12 @@ cucumber_feature_runner_new (const char *filename)
             file = (zfile_t *) zlist_next (files);
         }
         zlist_destroy (&files);
+        zdir_destroy (&feature_directory);
     }
     else {
-        zlist_append (self->feature_files, strdup (filename));
+        zlist_append (self->feature_files, strdup (fileOrDirname));
     }
+    zfile_destroy (&featureFileOrDirectory);
     return self;
 }
 
@@ -86,7 +89,7 @@ bool
 cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
 {
     bool isSuccessful = true;
-    char *featurefile = (char *) zlist_first (self->feature_files);
+    char *featurefile = (char *) zlist_pop (self->feature_files);
     while (featurefile) {
         cuc_gherkin_doc_t *gherkin_document = gherkin_document_new (featurefile);
         if (gherkin_document_valid (gherkin_document)) {
@@ -173,7 +176,8 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
         }
         gherkin_document_destroy (&gherkin_document);
 
-        featurefile = (char *) zlist_next (self->feature_files);
+        zstr_free (&featurefile);
+        featurefile = (char *) zlist_pop (self->feature_files);
     }
     return isSuccessful;
 }
