@@ -75,6 +75,11 @@ cucumber_feature_runner_destroy (cucumber_feature_runner_t **self_p)
     if (*self_p) {
         cucumber_feature_runner_t *self = *self_p;
         //  Free class properties here
+        char *filename =  (char *) zlist_pop (self->feature_files);
+        while (filename) {
+            zstr_free (&filename);
+            filename = (char *) zlist_pop (self->feature_files);
+        }
         zlist_destroy (&self->feature_files);
         //  Free object itself
         free (self);

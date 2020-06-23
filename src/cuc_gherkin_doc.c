@@ -119,8 +119,14 @@ gherkin_document_destroy (cuc_gherkin_doc_t **self_p)
         Event_delete ((const Event *) self->source_event);
         if (self->valid)
             Event_delete ((const Event *) self->gherkin_document_event);
-        else
+        else {
+            char *errormsg = (char *) zlist_pop (self->errors);
+            while (errormsg) {
+                zstr_free (&errormsg);
+                errormsg = (char *) zlist_pop (self->errors);
+            }
             zlist_destroy (&self->errors);
+        }
 
         //  Free object itself
         free (self);
