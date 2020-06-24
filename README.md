@@ -1,5 +1,7 @@
 # Cucumber-C
 
+[![Join the chat at https://gitter.im/cucumber/cucumber-c](https://badges.gitter.im/cucumber/cucumber-c.svg)](https://gitter.im/cucumber/cucumber-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Cucumber-C allows Cucumber to support step definitions written in C.
 
 * [Cucumber Website](https://cucumber.io)
