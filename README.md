@@ -1,6 +1,9 @@
+[![Join the chat at https://gitter.im/cucumber/cucumber-c](https://badges.gitter.im/cucumber/cucumber-c.svg)](https://gitter.im/cucumber/cucumber-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![license](https://img.shields.io/badge/license-MPLV2.0-blue.svg)](https://github.com/zeromq/dafka/blob/master/LICENSE)
+
 # Cucumber-C
 
-[![Join the chat at https://gitter.im/cucumber/cucumber-c](https://badges.gitter.im/cucumber/cucumber-c.svg)](https://gitter.im/cucumber/cucumber-c?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+[![Build Status](https://travis-ci.org/zeromq/dafka.png?branch=master)](https://travis-ci.org/zeromq/dafka)
 
 Cucumber-C allows Cucumber to support step definitions written in C.
 
