@@ -209,6 +209,14 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         CONFIG_OPTS+=("--quiet")
     fi
 
+    CMAKE_OPTS=()
+    CMAKE_OPTS+=("-DCMAKE_INSTALL_PREFIX:PATH=${BUILD_PREFIX}")
+    CMAKE_OPTS+=("-DCMAKE_PREFIX_PATH:PATH=${BUILD_PREFIX}")
+
+    if [ "$CLANG_FORMAT" != "" ] ; then
+        CMAKE_OPTS+=("-DCLANG_FORMAT=${CLANG_FORMAT}")
+    fi
+
     if [ "$HAVE_CCACHE" = yes ] && [ "${COMPILER_FAMILY}" = GCC ]; then
         PATH="/usr/lib/ccache:$PATH"
         export PATH
@@ -387,12 +395,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
             cd build
             $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
         fi
-        if [ -e ./configure ]; then
-            $CI_TIME make -j4
-            $CI_TIME make install
-        else
-            $CI_TIME cmake --build . --config Release --target install
-        fi
+        $CI_TIME make -j4
+        $CI_TIME make install
         cd "${BASE_PWD}"
     fi
 
@@ -428,14 +432,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         else
             mkdir build
             cd build
-            $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+            $CI_TIME cmake .. "${CMAKE_OPTS[@]}"
         fi
-        if [ -e ./configure ]; then
-            $CI_TIME make -j4
-            $CI_TIME make install
-        else
-            $CI_TIME cmake --build . --config Release --target install
-        fi
+        $CI_TIME make -j4
+        $CI_TIME make install
         cd "${BASE_PWD}"
     fi
 

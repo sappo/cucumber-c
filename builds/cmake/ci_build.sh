@@ -91,14 +91,10 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/
     else
         mkdir build
         cd build
-        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        $CI_TIME cmake .. "${CMAKE_OPTS[@]}"
     fi
-    if [ -e ./configure ]; then
-        $CI_TIME make -j4
-        $CI_TIME make install
-    else
-        $CI_TIME cmake --build . --config Release --target install
-    fi
+    $CI_TIME make -j4
+    $CI_TIME make install
     cd "${BASE_PWD}"
 fi
 
@@ -130,14 +126,10 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libczmq-dev >/
     else
         mkdir build
         cd build
-        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        $CI_TIME cmake .. "${CMAKE_OPTS[@]}"
     fi
-    if [ -e ./configure ]; then
-        $CI_TIME make -j4
-        $CI_TIME make install
-    else
-        $CI_TIME cmake --build . --config Release --target install
-    fi
+    $CI_TIME make -j4
+    $CI_TIME make install
     cd "${BASE_PWD}"
 fi
 
@@ -169,14 +161,10 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list gherkin-dev >/
     else
         mkdir build
         cd build
-        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        $CI_TIME cmake .. "${CMAKE_OPTS[@]}"
     fi
-    if [ -e ./configure ]; then
-        $CI_TIME make -j4
-        $CI_TIME make install
-    else
-        $CI_TIME cmake --build . --config Release --target install
-    fi
+    $CI_TIME make -j4
+    $CI_TIME make install
     cd "${BASE_PWD}"
 fi
 
@@ -208,14 +196,10 @@ if ! ((command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cjson-dev >/de
     else
         mkdir build
         cd build
-        $CI_TIME cmake .. -DCMAKE_INSTALL_PREFIX=$BUILD_PREFIX -DCMAKE_PREFIX_PATH=$BUILD_PREFIX
+        $CI_TIME cmake .. "${CMAKE_OPTS[@]}"
     fi
-    if [ -e ./configure ]; then
-        $CI_TIME make -j4
-        $CI_TIME make install
-    else
-        $CI_TIME cmake --build . --config Release --target install
-    fi
+    $CI_TIME make -j4
+    $CI_TIME make install
     cd "${BASE_PWD}"
 fi
 
