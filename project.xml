@@ -14,12 +14,12 @@
 
     <use project = "czmq" />
 
-    <use project = "gherkin"
-        header = "compiler.h"
-        repository = "https://github.com/cucumber/gherkin-c"
-        test = "Compiler_new" />
+    <use project = "gherkin" private = "1"
+         header = "compiler.h"
+         repository = "https://github.com/cucumber/gherkin-c"
+         test = "Compiler_new" />
 
-    <use project = "cJson"
+    <use project = "cJson" private = "1"
          header = "cjson/cJSON.h"
          repository = "https://github.com/DaveGamble/cJSON"
          test = "cJSON_Parse" />

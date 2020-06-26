@@ -34,6 +34,8 @@
 #include "../include/cucumber_c.h"
 
 //  Private external dependencies
+#include <compiler.h>
+#include <cjson/cJSON.h>
 
 //  Opaque class structures to allow forward references
 

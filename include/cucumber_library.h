@@ -22,8 +22,6 @@
 
 //  External dependencies
 #include <czmq.h>
-#include <compiler.h>
-#include <cjson/cJSON.h>
 
 //  CUCUMBER version macros for compile-time API detection
 #define CUCUMBER_VERSION_MAJOR 0
