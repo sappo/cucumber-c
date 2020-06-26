@@ -33,6 +33,8 @@
 //  External API
 #include "../include/cucumber_c.h"
 
+//  Private external dependencies
+
 //  Opaque class structures to allow forward references
 
 //  Extra headers

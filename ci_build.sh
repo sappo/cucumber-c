@@ -16,14 +16,35 @@ case "$CI_TIME" in
         CI_TIME="" ;;
 esac
 
-# Set this to enable verbose tracing
-[ -n "${CI_TRACE-}" ] || CI_TRACE="no"
-case "$CI_TRACE" in
-    [Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
-        set +x ;;
-    [Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
-        set -x ;;
-esac
+configure_tracing() {
+	# Set this to enable verbose tracing
+	[ -n "${CI_TRACE-}" ] || CI_TRACE="no"
+	case "$CI_TRACE" in
+		[Nn][Oo]|[Oo][Ff][Ff]|[Ff][Aa][Ll][Ss][Ee])
+			set +x ;;
+		[Yy][Ee][Ss]|[Oo][Nn]|[Tt][Rr][Uu][Ee])
+			set -x ;;
+	esac
+}
+configure_tracing
+
+fold_start() {
+  set +x
+  echo -e "travis_fold:start:$1\033[33;1m$2\033[0m"
+  configure_tracing
+}
+
+fold_start_plain() {
+  set +x
+  echo -e "travis_fold:start:$1"
+  configure_tracing
+}
+
+fold_end() {
+  set +x
+  echo -e "\ntravis_fold:end:$1\r"
+  configure_tracing
+}
 
 case $TRAVIS_OS_NAME in
 windows)
@@ -141,8 +162,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     mkdir -p "${CCACHE_DIR}" || HAVE_CCACHE=no
 
     if [ "$HAVE_CCACHE" = yes ] && [ -d "$CCACHE_DIR" ]; then
+        fold_start_plain ccache.before
         echo "CCache stats before build:"
         ccache -s || true
+        fold_end ccache.before
     fi
 
     CONFIG_OPTS=()
@@ -266,8 +289,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     # Clone and build dependencies, if not yet installed to Travis env as DEBs
     # or MacOS packages; other OSes are not currently supported by Travis cloud
     [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
-
     # Start of recipe for dependency: libzmq
+	fold_start dependency.libzmq "Install dependency libzmq"
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1) \
     ; then
@@ -309,8 +332,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         fi
         cd "${BASE_PWD}"
     fi
+	fold_end dependency.libzmq
 
     # Start of recipe for dependency: czmq
+	fold_start dependency.czmq "Install dependency czmq"
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libczmq-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions czmq >/dev/null 2>&1) \
     ; then
@@ -352,8 +377,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         fi
         cd "${BASE_PWD}"
     fi
+	fold_end dependency.czmq
 
     # Start of recipe for dependency: gherkin
+	fold_start dependency.gherkin "Install dependency gherkin"
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list gherkin-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions gherkin >/dev/null 2>&1) \
     ; then
@@ -395,8 +422,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         fi
         cd "${BASE_PWD}"
     fi
+	fold_end dependency.gherkin
 
     # Start of recipe for dependency: cjson
+	fold_start dependency.cjson "Install dependency cjson"
     if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cjson-dev >/dev/null 2>&1) || \
            (command -v brew >/dev/null 2>&1 && brew ls --versions cjson >/dev/null 2>&1) \
     ; then
@@ -438,8 +467,11 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
         fi
         cd "${BASE_PWD}"
     fi
+	fold_end dependency.cjson
+
 
     # Build and check this project; note that zprojects always have an autogen.sh
+	fold_start build.draft "Build and check this project with DRAFT APIs"
     echo ""
     echo "`date`: INFO: Starting build of currently tested project with DRAFT APIs..."
     CCACHE_BASEDIR=${PWD}
@@ -487,8 +519,10 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     echo "=== Are GitIgnores good after 'make (dist)check' with drafts?"
     make check-gitignore
     echo "==="
+	fold_end build.draft
 
     # Build and check this project without DRAFT APIs
+	fold_start build.stable "Build and check this project with STABLE APIs"
     echo ""
     echo "`date`: INFO: Starting build of currently tested project without DRAFT APIs..."
     make distclean
@@ -513,10 +547,13 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     echo "=== Are GitIgnores good after 'make (dist)check' without drafts?"
     make check-gitignore
     echo "==="
+	fold_end build.stable
 
     if [ "$HAVE_CCACHE" = yes ]; then
+        fold_start_plain ccache.after
         echo "CCache stats after build:"
         ccache -s
+        fold_end ccache.after
     fi
     ;;
 bindings)

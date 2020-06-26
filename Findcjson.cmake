@@ -19,7 +19,7 @@ endif (NOT MSVC)
 
 find_path (
     CJSON_INCLUDE_DIRS
-    NAMES cjson/cjson.h
+    NAMES cjson/cJSON.h
     HINTS ${PC_CJSON_INCLUDE_HINTS}
 )
 

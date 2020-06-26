@@ -87,6 +87,7 @@ addons:
   homebrew:
     packages:
     - cjson
+    update: true
 
 matrix:
   include:
