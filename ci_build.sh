@@ -291,8 +291,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
     [ -z "$CI_TIME" ] || echo "`date`: Starting build of dependencies (if any)..."
     # Start of recipe for dependency: libzmq
 	fold_start dependency.libzmq "Install dependency libzmq"
-    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libzmq3-dev >/dev/null 2>&1) || \
-           (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1) \
+    if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libzmq3-dev >/dev/null 2>&1) || \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions libzmq >/dev/null 2>&1)) \
     ; then
         echo ""
         BASE_PWD=${PWD}
@@ -336,8 +336,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
 
     # Start of recipe for dependency: czmq
 	fold_start dependency.czmq "Install dependency czmq"
-    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list libczmq-dev >/dev/null 2>&1) || \
-           (command -v brew >/dev/null 2>&1 && brew ls --versions czmq >/dev/null 2>&1) \
+    if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s libczmq-dev >/dev/null 2>&1) || \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions czmq >/dev/null 2>&1)) \
     ; then
         echo ""
         BASE_PWD=${PWD}
@@ -381,8 +381,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
 
     # Start of recipe for dependency: gherkin
 	fold_start dependency.gherkin "Install dependency gherkin"
-    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list gherkin-dev >/dev/null 2>&1) || \
-           (command -v brew >/dev/null 2>&1 && brew ls --versions gherkin >/dev/null 2>&1) \
+    if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s gherkin-dev >/dev/null 2>&1) || \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions gherkin >/dev/null 2>&1)) \
     ; then
         echo ""
         BASE_PWD=${PWD}
@@ -426,8 +426,8 @@ default|default-Werror|default-with-docs|valgrind|clang-format-check)
 
     # Start of recipe for dependency: cjson
 	fold_start dependency.cjson "Install dependency cjson"
-    if ! (command -v dpkg-query >/dev/null 2>&1 && dpkg-query --list cjson-dev >/dev/null 2>&1) || \
-           (command -v brew >/dev/null 2>&1 && brew ls --versions cjson >/dev/null 2>&1) \
+    if ! ((command -v dpkg >/dev/null 2>&1 && dpkg -s cjson-dev >/dev/null 2>&1) || \
+          (command -v brew >/dev/null 2>&1 && brew ls --versions cjson >/dev/null 2>&1)) \
     ; then
         echo ""
         BASE_PWD=${PWD}
