@@ -29,6 +29,8 @@
 
 struct _cucumber_feature_runner_t {
     zlist_t *feature_files;
+    int total_scenarios;
+    int total_steps;
 };
 
 
@@ -41,6 +43,9 @@ cucumber_feature_runner_new (const char *fileOrDirname)
     cucumber_feature_runner_t *self = (cucumber_feature_runner_t *) zmalloc (sizeof (cucumber_feature_runner_t));
     assert (self);
     //  Initialize class properties
+    self->total_scenarios = 0;
+    self->total_steps = 0;
+
     self->feature_files = zlist_new ();
     zfile_t *featureFileOrDirectory = zfile_new (NULL, fileOrDirname);
     if (zfile_is_directory (featureFileOrDirectory)) {
@@ -101,6 +106,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
             zlist_t *pickles = gherkin_document_get_pickles (gherkin_document);
             char *pickle_json = (char *) zlist_first (pickles);
             while (pickle_json != NULL) {
+                self->total_scenarios++;
                 cuc_pickle_t *pickle = pickle_new (pickle_json);
                 zstr_free (&pickle_json);
 
@@ -115,6 +121,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
 
                 const char *pickle_step = pickle_first_step (pickle);
                 while (pickle_step != NULL) {
+                    self->total_steps++;
                     printf ("%s  Step: %s%s\r", BLUE, pickle_step, DEFAULT);
                     fflush (stdout);
                     zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
@@ -184,6 +191,8 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
         zstr_free (&featurefile);
         featurefile = (char *) zlist_pop (self->feature_files);
     }
+    printf ("%s%d Scenarios%s\n", YELLOW, self->total_scenarios, DEFAULT);
+    printf ("%s%d Steps%s\n", YELLOW, self->total_steps, DEFAULT);
     return isSuccessful;
 }
 
