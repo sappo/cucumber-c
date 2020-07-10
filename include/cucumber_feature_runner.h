@@ -27,7 +27,7 @@ CUCUMBER_EXPORT void
     cucumber_feature_runner_destroy (cucumber_feature_runner_t **self_p);
 
 CUCUMBER_EXPORT bool
-    cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client);
+    cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, zlist_t *identities);
 
 //  Self test of this class
 CUCUMBER_EXPORT void

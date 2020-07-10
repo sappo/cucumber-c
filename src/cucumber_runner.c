@@ -34,14 +34,14 @@ main (int argc, char *argv [])
     if (verbose)
         zsys_info ("cucumber_runner - ");
 
-    zsock_t *client = zsock_new_dealer (">tcp://127.0.0.1:8888");
+    zsock_t *client = zsock_new_dealer ("@tcp://127.0.0.1:8888");
     assert (client);
 
     zclock_sleep (250);  // Wait until connected
     // TODO wait until ready!
 
     cucumber_feature_runner_t *feature_runner = cucumber_feature_runner_new (filename);
-    cucumber_feature_runner_run (feature_runner, client);
+    cucumber_feature_runner_run (feature_runner, client, zlist_new ());
 
     zsock_destroy (&client);
     cucumber_feature_runner_destroy (&feature_runner);

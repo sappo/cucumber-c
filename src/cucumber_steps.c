@@ -51,13 +51,14 @@ cucumber_steps_new (zsock_t *pipe, cucumber_steps_args_t *steps_args)
     self->poller = zpoller_new (self->pipe, NULL);
 
     //  Initialize properties
-    self->server_socket = zsock_new_dealer ("@tcp://127.0.0.1:8888");
+    self->server_socket = zsock_new_dealer (">tcp://127.0.0.1:8888");
     assert (self->server_socket);
 
     self->state_constructor = cucumber_steps_args_state_constructor_fn (steps_args);
     self->state_destructor = cucumber_steps_args_state_destructor_fn (steps_args);
     self->register_step_defs = cucumber_steps_args_register_step_defs_fn (steps_args);
     zpoller_add (self->poller, self->server_socket);
+    zsock_send (self->server_socket, "s", "HELLO");
     return self;
 }
 

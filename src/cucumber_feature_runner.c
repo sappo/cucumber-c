@@ -96,7 +96,7 @@ cucumber_feature_runner_destroy (cucumber_feature_runner_t **self_p)
 //  Runs the scenario in the given feature file.
 
 bool
-cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
+cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, zlist_t *identities)
 {
     bool isSuccessful = true;
     char *featurefile = (char *) zlist_pop (self->feature_files);
@@ -110,66 +110,111 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client)
                 cuc_pickle_t *pickle = pickle_new (pickle_json);
                 zstr_free (&pickle_json);
 
-                printf ("%sScenario: %s%s\n", YELLOW, pickle_name (pickle), DEFAULT);
-                zsock_send (client, "ss", "START SCENARIO", pickle_id (pickle));
                 char *command, *message;
-                zsock_recv (client, "ss", &command, &message);
-                assert (streq (command, "SCENARIO STARTED"));
-                assert (streq (message, pickle_id (pickle)));
-                zstr_free (&command);
-                zstr_free (&message);
+                zframe_t *identity = (zframe_t *) zlist_first (identities);
+                printf ("%sScenario: %s%s\n", YELLOW, pickle_name (pickle), DEFAULT);
+                while (identity) {
+                    zsock_send (client, "fss", identity, "START SCENARIO", pickle_id (pickle));
+                    zsock_recv (client, "fss", NULL, &command, &message);
+                    assert (streq (command, "SCENARIO STARTED"));
+                    assert (streq (message, pickle_id (pickle)));
+                    zstr_free (&command);
+                    zstr_free (&message);
+
+                    identity = (zframe_t *) zlist_next (identities);
+                }
 
                 const char *pickle_step = pickle_first_step (pickle);
                 while (pickle_step != NULL) {
                     self->total_steps++;
                     printf ("%s  Step: %s%s\r", BLUE, pickle_step, DEFAULT);
                     fflush (stdout);
-                    zsock_send (client, "sss", "RUN STEP", pickle_id (pickle), pickle_step);
-                    char *result;
-                    zsock_recv (client, "sss", &command, &message, &result);
-                    assert (streq (message, pickle_id (pickle)));
 
-                    if (streq (command, "STEP SUCCEEDED")) {
-                        char *output = __to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT);
-                        puts (output);
-                        zstr_free (&output);
+                    identity = (zframe_t *) zlist_first (identities);
+                    zlist_t *success_messages = zlist_new ();
+                    zlist_t *failure_messages = zlist_new ();
+                    zlist_t *error_messages = zlist_new ();
+                    zlist_autofree (success_messages);
+                    zlist_autofree (failure_messages);
+                    zlist_autofree (error_messages);
+                    while (identity) {
+                        zsock_send (client, "fsss", identity, "RUN STEP", pickle_id (pickle), pickle_step);
+                        char *result;
+                        zsock_recv (client, "fsss", NULL, &command, &message, &result);
+                        assert (streq (message, pickle_id (pickle)));
+
+                        if (streq (command, "STEP SUCCEEDED")) {
+                            char *output = __to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT);
+                            zlist_append (success_messages, output);
+                            zstr_free (&output);
+                        }
+                        else
+                        if (streq (command, "STEP FAILED")) {
+                            char *output = __to_string("%s  Step: %s (FAILURE)\n\t%s%s\n", RED, pickle_step, result, DEFAULT);
+                            zlist_append (failure_messages, output);
+                            zstr_free (&output);
+                        }
+                        else
+                        if (streq (command, "STEP ERRORED")) {
+                            char *output = __to_string("%s  Step: %s (ERROR)\n\t%s%s\n", RED, pickle_step, result, DEFAULT);
+                            zlist_append (error_messages, output);
+                            zstr_free (&output);
+                        }
+                        else {
+                            printf ("\n\n%s(Unknown command: %s)%s\n", RED, command, DEFAULT);
+                            isSuccessful = false;
+                        }
+
+                        zstr_free (&command);
+                        zstr_free (&message);
+                        zstr_free (&result);
+
+                        identity = (zframe_t *) zlist_next (identities);
+                    }
+
+                    if (zlist_size (success_messages) > 0) {
+                        char *message = (char *) zlist_first (success_messages);
+                        while (message) {
+                            puts (message);
+                            message = (char *) zlist_next (success_messages);
+                        }
                     }
                     else
-                    if (streq (command, "STEP FAILED")) {
-                        char *output = __to_string("%s  Step: %s (FAILURE)%s", RED, pickle_step, DEFAULT);
-                        puts (output);
-                        zstr_free (&output);
-                        printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
+                    if (zlist_size (failure_messages) > 0) {
+                        char *message = (char *) zlist_first (failure_messages);
+                        while (message) {
+                            puts (message);
+                            message = (char *) zlist_next (failure_messages);
+                        }
                         isSuccessful = false;
-                        break;
                     }
                     else
-                    if (streq (command, "STEP ERRORED")) {
-                        char *output = __to_string("%s  Step: %s (ERROR)%s", RED, pickle_step, DEFAULT);
-                        puts (output);
-                        zstr_free (&output);
-                        printf ("\n\t%s%s%s\n", RED, result, DEFAULT);
+                    if (zlist_size (error_messages) > 0) {
+                        char *message = (char *) zlist_first (error_messages);
+                        while (message) {
+                            puts (message);
+                            message = (char *) zlist_next (error_messages);
+                        }
                         isSuccessful = false;
-                        break;
                     }
-                    else {
-                        printf ("\n\n%s(Unknown command: %s)%s\n", RED, command, DEFAULT);
-                        isSuccessful = false;
-                        break;
-                    }
-
-                    zstr_free (&command);
-                    zstr_free (&message);
-                    zstr_free (&result);
+                    zlist_destroy (&success_messages);
+                    zlist_destroy (&failure_messages);
+                    zlist_destroy (&error_messages);
 
                     pickle_step = pickle_next_step (pickle);
                 }
-                zsock_send (client, "ss", "END SCENARIO", pickle_id (pickle));
-                zsock_recv (client, "ss", &command, &message);
-                assert (streq (command, "SCENARIO ENDED"));
-                assert (streq (message, pickle_id (pickle)));
-                zstr_free (&command);
-                zstr_free (&message);
+
+                identity = (zframe_t *) zlist_first (identities);
+                while (identity) {
+                    zsock_send (client, "fss", identity, "END SCENARIO", pickle_id (pickle));
+                    zsock_recv (client, "fss", NULL, &command, &message);
+                    assert (streq (command, "SCENARIO ENDED"));
+                    assert (streq (message, pickle_id (pickle)));
+                    zstr_free (&command);
+                    zstr_free (&message);
+
+                    identity = (zframe_t *) zlist_next (identities);
+                }
 
                 pickle_destroy (&pickle);
                 pickle_json = (char *) zlist_next (pickles);
