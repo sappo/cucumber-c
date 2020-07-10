@@ -33,7 +33,9 @@
     assert (name##_steps_runner);
 
 #define STEP_DEFS(name, state_constructor, state_destructor)\
-    void register_##name##_step_defs (cucumber_t *cucumber);\
+    void register_##name##_step_defs (cucumber_t *cucumber)
+
+#define STEP_RUNNER(name, state_constructor, state_destructor)\
     int main(int argc, char** argv) {\
         zargs_t *args = zargs_new (argc, argv);\
         if (zargs_hasx (args, "--help", "-h", NULL)) {\
@@ -50,8 +52,7 @@
         zstr_send (name##_steps_runner, "$TERM");\
         zactor_destroy (&name##_steps_runner);\
         return 0;\
-    }\
-    void register_##name##_step_defs (cucumber_t *cucumber)
+    }
 
 #define STEP(step_text, step_fun) {\
     cucumber_step_def_t *step_def = cucumber_step_def_new (step_text, step_fun);\

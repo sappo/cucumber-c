@@ -700,15 +700,15 @@ AC_ARG_ENABLE([cucumber_runner],
 AM_CONDITIONAL([ENABLE_CUCUMBER_RUNNER], [test x$enable_cucumber_runner != xno])
 AM_COND_IF([ENABLE_CUCUMBER_RUNNER], [AC_MSG_NOTICE([ENABLE_CUCUMBER_RUNNER defined])])
 
-# Check for step_defs intent
-AC_ARG_ENABLE([step_defs],
-    AS_HELP_STRING([--enable-step_defs],
-        [Compile and install 'step_defs' [default=yes]]),
-    [enable_step_defs=$enableval],
-    [enable_step_defs=yes])
+# Check for step_runner intent
+AC_ARG_ENABLE([step_runner],
+    AS_HELP_STRING([--enable-step_runner],
+        [Compile and install 'step_runner' [default=yes]]),
+    [enable_step_runner=$enableval],
+    [enable_step_runner=yes])
 
-AM_CONDITIONAL([ENABLE_STEP_DEFS], [test x$enable_step_defs != xno])
-AM_COND_IF([ENABLE_STEP_DEFS], [AC_MSG_NOTICE([ENABLE_STEP_DEFS defined])])
+AM_CONDITIONAL([ENABLE_STEP_RUNNER], [test x$enable_step_runner != xno])
+AM_COND_IF([ENABLE_STEP_RUNNER], [AC_MSG_NOTICE([ENABLE_STEP_RUNNER defined])])
 
 # Check for cucumber_selftest intent
 AC_ARG_ENABLE([cucumber_selftest],

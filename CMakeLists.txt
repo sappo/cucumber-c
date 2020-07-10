@@ -186,6 +186,7 @@ set (cucumber_headers
 
 IF (ENABLE_DRAFTS)
     list(APPEND cucumber_headers
+        include/step_defs.h
         include/cucumber_feature_runner.h
         include/cuc_gherkin_doc.h
         include/cuc_pickle.h
@@ -211,6 +212,7 @@ set (cucumber_sources
 
 IF (ENABLE_DRAFTS)
     list (APPEND cucumber_sources
+        src/step_defs.c
         src/cucumber_feature_runner.c
         src/cuc_gherkin_doc.c
         src/cuc_pickle.c
@@ -413,12 +415,12 @@ install(TARGETS cucumber_runner
     RUNTIME DESTINATION bin
 )
 add_executable(
-    step_defs
-    "${SOURCE_DIR}/src/step_defs.c"
+    step_runner
+    "${SOURCE_DIR}/src/step_runner.c"
 )
 if (TARGET cucumber)
 target_link_libraries(
-    step_defs
+    step_runner
     cucumber
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
@@ -429,7 +431,7 @@ target_link_libraries(
 endif()
 if (NOT TARGET cucumber AND TARGET cucumber-static)
 target_link_libraries(
-    step_defs
+    step_runner
     cucumber-static
     ${LIBZMQ_LIBRARIES}
     ${CZMQ_LIBRARIES}
@@ -439,7 +441,7 @@ target_link_libraries(
     ${OPTIONAL_LIBRARIES_STATIC}
 )
 endif()
-install(TARGETS step_defs
+install(TARGETS step_runner
     RUNTIME DESTINATION bin
 )
 add_executable(
@@ -488,6 +490,7 @@ set(TEST_CLASSES
 
 IF (ENABLE_DRAFTS)
     list (APPEND TEST_CLASSES
+    step_defs
     cucumber_feature_runner
     cuc_gherkin_doc
     cuc_pickle
@@ -513,6 +516,7 @@ if (NOT TARGET make-selftest-rw)
         COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_BINARY_DIR}/src/selftest-rw
     )
 endif()
+
 
 set_directory_properties(
     PROPERTIES
@@ -563,7 +567,7 @@ set(cmake_generated ${PROJECT_BINARY_DIR}/CMakeCache.txt
                     ${PROJECT_BINARY_DIR}/src/libcucumber.so
                     ${PROJECT_BINARY_DIR}/src/cucumber-c_selftest
                     ${PROJECT_BINARY_DIR}/src/cucumber_runner
-                    ${PROJECT_BINARY_DIR}/src/step_defs
+                    ${PROJECT_BINARY_DIR}/src/step_runner
                     ${PROJECT_BINARY_DIR}/src/cucumber_selftest
 )
 

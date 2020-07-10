@@ -34,13 +34,16 @@ To report an issue, use the [Cucumber-C issue tracker](https://github.com/sappo/
 You can define your step definitions as follows:
 
 ```C
+#define CZMQ_BUILD_DRAFT_API
+#include <cucumber_c.h>
+
 struct _my_state_t {
     int filler;
 };
 typedef struct _my_state_t my_state_t;
 
 my_state_t *
-my_state_new ()
+my_state_new (bool verbose)
 {
     return (my_state_t *) zmalloc (sizeof (my_state_t));
 }
@@ -60,17 +63,19 @@ my_state_destroy (my_state_t **self_p)
 }
 
 void
-given_a_topic (zrex_t *rex, void *state_p) {
+given_a_topic (cucumber_step_def_t *self, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
     my_state_t *state = (my_state_t *) state_p;
+    state->filler = 1;
 }
 
 void
-when_message_is_sent (zrex_t *rex, void *state_p) {
+when_message_is_sent (cucumber_step_def_t *self, void *state_p) {
     const char *text, *topic;
     FETCH_PARAMS(&text, &topic)
     my_state_t *state = (my_state_t *) state_p;
+    state->filler = 2;
 }
 
 STEP_DEFS(protocol, my_state_new, my_state_destroy) {
@@ -80,6 +85,8 @@ STEP_DEFS(protocol, my_state_new, my_state_destroy) {
     WHEN("a (\\w+) message with sequence larger 0 is sent on topic '(\\w+)'",
          when_message_is_sent)
 }
+
+STEP_RUNNER(protocol, my_state_new, my_state_destroy)
 ```
 
 Now compile and run your step definitions

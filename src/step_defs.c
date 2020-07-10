@@ -14,7 +14,6 @@
 struct _my_state_t {
     int filler;
 };
-typedef struct _my_state_t my_state_t;
 
 my_state_t *
 my_state_new (bool verbose)
@@ -58,4 +57,8 @@ STEP_DEFS(protocol, my_state_new, my_state_destroy) {
 
     WHEN("a (\\w+) message with sequence larger 0 is sent on topic '(\\w+)'",
          when_message_is_sent)
+}
+
+void
+step_defs_test (bool verbose) {
 }

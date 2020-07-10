@@ -11,6 +11,8 @@
 *.xml7
 
 # Ignore the source doc texts generated from program sources
+step_defs.txt
+step_defs.doc
 cucumber_feature_runner.txt
 cucumber_feature_runner.doc
 cuc_gherkin_doc.txt
@@ -29,8 +31,8 @@ cucumber_steps.txt
 cucumber_steps.doc
 cucumber_runner.txt
 cucumber_runner.doc
-step_defs.txt
-step_defs.doc
+step_runner.txt
+step_runner.doc
 
 # Make sure to track the manually maintained project description
 !*.adoc

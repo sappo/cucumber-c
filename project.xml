@@ -25,7 +25,8 @@
          test = "cJSON_Parse" />
 
     <main name = "cucumber_runner" />
-    <main name = "step_defs" />
+    <class name = "step_defs" />
+    <main name = "step_runner" />
 
     <actor name = "cucumber_steps" />
 

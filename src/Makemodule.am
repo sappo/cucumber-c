@@ -17,6 +17,7 @@ src_libcucumber_la_SOURCES = \
 
 if ENABLE_DRAFTS
 src_libcucumber_la_SOURCES += \
+    src/step_defs.c \
     src/cucumber_feature_runner.c \
     src/cuc_gherkin_doc.c \
     src/cuc_pickle.c \
@@ -60,12 +61,12 @@ src_cucumber_runner_LDADD = ${program_libs}
 src_cucumber_runner_SOURCES = src/cucumber_runner.c
 endif #ENABLE_CUCUMBER_RUNNER
 
-if ENABLE_STEP_DEFS
-bin_PROGRAMS += src/step_defs
-src_step_defs_CPPFLAGS = ${AM_CPPFLAGS}
-src_step_defs_LDADD = ${program_libs}
-src_step_defs_SOURCES = src/step_defs.c
-endif #ENABLE_STEP_DEFS
+if ENABLE_STEP_RUNNER
+bin_PROGRAMS += src/step_runner
+src_step_runner_CPPFLAGS = ${AM_CPPFLAGS}
+src_step_runner_LDADD = ${program_libs}
+src_step_runner_SOURCES = src/step_runner.c
+endif #ENABLE_STEP_RUNNER
 
 if ENABLE_CUCUMBER_SELFTEST
 check_PROGRAMS += src/cucumber_selftest
@@ -78,7 +79,7 @@ endif #ENABLE_CUCUMBER_SELFTEST
 # define custom target for all products of /src
 src: \
 		src/cucumber_runner \
-		src/step_defs \
+		src/step_runner \
 		src/cucumber_selftest \
 		src/libcucumber.la
 
@@ -156,6 +157,13 @@ check-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_bu
 	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+check-step_defs: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -t step_defs
+	$(MAKE) check-empty-selftest-rw
+check-step_defs-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -v -t step_defs
+	$(MAKE) check-empty-selftest-rw
+
 check-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute $(builddir)/src/cucumber_selftest -t cucumber_feature_runner
 	$(MAKE) check-empty-selftest-rw
@@ -230,6 +238,20 @@ memcheck-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top
 		$(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+memcheck-step_defs: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -t step_defs
+	$(MAKE) check-empty-selftest-rw
+memcheck-step_defs-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
+		--leak-check=full --show-reachable=yes --error-exitcode=1 \
+		--suppressions=$(srcdir)/src/.valgrind.supp \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -v -t step_defs
+	$(MAKE) check-empty-selftest-rw
 memcheck-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=memcheck \
 		--leak-check=full --show-reachable=yes --error-exitcode=1 \
@@ -356,6 +378,16 @@ callcheck-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(to
 		$(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+callcheck-step_defs: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -t step_defs
+	$(MAKE) check-empty-selftest-rw
+callcheck-step_defs-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
+		$(VALGRIND_OPTIONS) \
+		$(builddir)/src/cucumber_selftest -v -t step_defs
+	$(MAKE) check-empty-selftest-rw
 callcheck-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute valgrind --tool=callgrind \
 		$(VALGRIND_OPTIONS) \
@@ -448,6 +480,14 @@ debug-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_bu
 		--args $(builddir)/src/cucumber_selftest -v
 	$(MAKE) check-empty-selftest-rw
 
+debug-step_defs: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/cucumber_selftest -t step_defs
+	$(MAKE) check-empty-selftest-rw
+debug-step_defs-verbose: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
+	$(LIBTOOL) --mode=execute gdb -q \
+		--args $(builddir)/src/cucumber_selftest -v -t step_defs
+	$(MAKE) check-empty-selftest-rw
 debug-cucumber_feature_runner: src/cucumber_selftest $(top_builddir)/$(SELFTEST_DIR_RW) $(top_builddir)/$(SELFTEST_DIR_RO)
 	$(LIBTOOL) --mode=execute gdb -q \
 		--args $(builddir)/src/cucumber_selftest -t cucumber_feature_runner
