@@ -131,13 +131,14 @@ cucumber_steps_recv_pickle (cucumber_steps_t *self)
             }
         }
         else {
-            zsock_send (self->server_socket,
-                        "sss", "STEP ERRORED", id, "Error: Step definition not found");
+            zsock_send (self->server_socket, "ss", "STEP NOT FOUND", id);
         }
+
+        if (self->verbose)
+            printf ("Step %s ran\n", id);
+
         zstr_free (&id);
         zstr_free (&pickle_step);
-        if (self->verbose)
-            printf ("Step ran\n");
     }
 
     zstr_free (&command);

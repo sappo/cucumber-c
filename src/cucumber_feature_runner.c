@@ -110,16 +110,16 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, z
                 cuc_pickle_t *pickle = pickle_new (pickle_json);
                 zstr_free (&pickle_json);
 
-                char *command, *message;
+                char *command, *scenario_id;
                 zframe_t *identity = (zframe_t *) zlist_first (identities);
                 printf ("%sScenario: %s%s\n", YELLOW, pickle_name (pickle), DEFAULT);
                 while (identity) {
                     zsock_send (client, "fss", identity, "START SCENARIO", pickle_id (pickle));
-                    zsock_recv (client, "fss", NULL, &command, &message);
+                    zsock_recv (client, "fss", NULL, &command, &scenario_id);
                     assert (streq (command, "SCENARIO STARTED"));
-                    assert (streq (message, pickle_id (pickle)));
+                    assert (streq (scenario_id, pickle_id (pickle)));
                     zstr_free (&command);
-                    zstr_free (&message);
+                    zstr_free (&scenario_id);
 
                     identity = (zframe_t *) zlist_next (identities);
                 }
@@ -133,15 +133,14 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, z
                     identity = (zframe_t *) zlist_first (identities);
                     zlist_t *success_messages = zlist_new ();
                     zlist_t *failure_messages = zlist_new ();
-                    zlist_t *error_messages = zlist_new ();
                     zlist_autofree (success_messages);
                     zlist_autofree (failure_messages);
-                    zlist_autofree (error_messages);
+                    int step_not_found_counter = 0;
                     while (identity) {
                         zsock_send (client, "fsss", identity, "RUN STEP", pickle_id (pickle), pickle_step);
                         char *result;
-                        zsock_recv (client, "fsss", NULL, &command, &message, &result);
-                        assert (streq (message, pickle_id (pickle)));
+                        zsock_recv (client, "fsss", NULL, &command, &scenario_id, &result);
+                        assert (streq (scenario_id, pickle_id (pickle)));
 
                         if (streq (command, "STEP SUCCEEDED")) {
                             char *output = __to_string("%s  Step: %s (%s)%s", GREEN, pickle_step, result, DEFAULT);
@@ -155,10 +154,8 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, z
                             zstr_free (&output);
                         }
                         else
-                        if (streq (command, "STEP ERRORED")) {
-                            char *output = __to_string("%s  Step: %s (ERROR)\n\t%s%s\n", RED, pickle_step, result, DEFAULT);
-                            zlist_append (error_messages, output);
-                            zstr_free (&output);
+                        if (streq (command, "STEP NOT FOUND")) {
+                            step_not_found_counter++;
                         }
                         else {
                             printf ("\n\n%s(Unknown command: %s)%s\n", RED, command, DEFAULT);
@@ -166,7 +163,7 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, z
                         }
 
                         zstr_free (&command);
-                        zstr_free (&message);
+                        zstr_free (&scenario_id);
                         zstr_free (&result);
 
                         identity = (zframe_t *) zlist_next (identities);
@@ -189,17 +186,14 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, z
                         isSuccessful = false;
                     }
                     else
-                    if (zlist_size (error_messages) > 0) {
-                        char *message = (char *) zlist_first (error_messages);
-                        while (message) {
-                            puts (message);
-                            message = (char *) zlist_next (error_messages);
-                        }
-                        isSuccessful = false;
+                    if (step_not_found_counter == zlist_size (identities)) {
+                            char *output = __to_string("%s  Step: %s (NOT FOUND)%s", RED, pickle_step, DEFAULT);
+                            puts (output);
+                            zstr_free (&output);
                     }
+
                     zlist_destroy (&success_messages);
                     zlist_destroy (&failure_messages);
-                    zlist_destroy (&error_messages);
 
                     pickle_step = pickle_next_step (pickle);
                 }
@@ -207,11 +201,11 @@ cucumber_feature_runner_run (cucumber_feature_runner_t *self, zsock_t *client, z
                 identity = (zframe_t *) zlist_first (identities);
                 while (identity) {
                     zsock_send (client, "fss", identity, "END SCENARIO", pickle_id (pickle));
-                    zsock_recv (client, "fss", NULL, &command, &message);
+                    zsock_recv (client, "fss", NULL, &command, &scenario_id);
                     assert (streq (command, "SCENARIO ENDED"));
-                    assert (streq (message, pickle_id (pickle)));
+                    assert (streq (scenario_id, pickle_id (pickle)));
                     zstr_free (&command);
-                    zstr_free (&message);
+                    zstr_free (&scenario_id);
 
                     identity = (zframe_t *) zlist_next (identities);
                 }
